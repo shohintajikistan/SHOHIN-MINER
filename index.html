@@ -34,6 +34,7 @@ button:active{transform:scale(.97)}button.primary{background:linear-gradient(145
 <div class="toast" id="toast"></div>
 <div class="loading" id="loading"><div class="loader">SHOHIN MINER<span>ЗАГРУЗКА BABYLON 3D</span></div></div>
 <script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
 <script>
 (()=>{
 'use strict';
@@ -73,13 +74,31 @@ const pick=new B.TransformNode('pickaxe',scene);pick.position.set(.02,-.58,.1);p
 const orePile=new B.TransformNode('fresh ore pile',scene);orePile.position.set(-3.2,.1,-2.5);
 for(let i=0;i<9;i++){const c=B.MeshBuilder.CreatePolyhedron('loose ore',{type:1,size:.28+(i%3)*.07},scene);c.position.set(Math.sin(i*4)*.65,(i%3)*.12,Math.cos(i*3)*.35);c.material=i%2?emerald:gold;c.parent=orePile;}
 const dust=B.MeshBuilder.CreateSphere('dust particle',{diameter:.045,segments:4},scene);dust.material=material('dust','#d8c99a');const dusts=[];for(let i=0;i<45;i++){const p=dust.clone('dust '+i);p.position.set((Math.random()-.5)*12,Math.random()*5,(Math.random()-.5)*9);p.visibility=.5;dusts.push(p);}
+
+// Настоящий rigged GLB-гном. Процедурный персонаж остаётся резервом на случай ошибки сети.
+let dwarfRoot=null;
+const dwarfModelUrl='https://assets.stoicsoft.com/1designtool/3d/models/dwarf-miner/e195f91ccd/model.glb';
+B.SceneLoader.ImportMeshAsync('', 'https://assets.stoicsoft.com/1designtool/3d/models/dwarf-miner/e195f91ccd/', 'model.glb', scene)
+.then(result=>{
+  const root=new B.TransformNode('SHOHIN real dwarf',scene);
+  result.meshes.forEach(mesh=>{if(!mesh.parent)mesh.parent=root;});
+  root.position.set(-1.7,0,-.25);
+  root.rotation.y=-2.55;
+  root.scaling.setAll(1.45);
+  dwarfRoot=root;
+  miner.setEnabled(false);
+  // Небольшая idle-анимация корпуса; полноценный цикл удара киркой добавим после проверки костей модели.
+  toast('3D-гном загружен в шахту');
+})
+.catch(err=>console.warn('Dwarf GLB could not be loaded; procedural miner remains active.',err));
+
 let mined=0,upgrade=0,depth=1,workRate=1,lastCount=0;
 function toast(message){const el=document.getElementById('toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1700);}
 document.getElementById('upgrade').onclick=()=>{if(upgrade<5){upgrade++;workRate+=.45;toast('Кирка улучшена. Скорость добычи выросла.');}else toast('Максимальный уровень кирки.');};
 document.getElementById('deeper').onclick=()=>{if(depth===1){depth=2;orePile.position.x=-2.2;toast('Новая рудная жила открыта!');}else toast('Следующий участок шахты строится.');};
 let elapsed=0;
 scene.onBeforeRenderObservable.add(()=>{
-const dt=engine.getDeltaTime()/1000;elapsed+=dt;const swing=Math.sin(elapsed*3.2*workRate),hit=Math.max(0,swing);
+const dt=engine.getDeltaTime()/1000;elapsed+=dt;const swing=Math.sin(elapsed*3.2*workRate),hit=Math.max(0,swing);if(dwarfRoot){dwarfRoot.position.y=Math.sin(elapsed*2.1)*.025;dwarfRoot.rotation.y=-2.55+Math.sin(elapsed*1.2)*.025;}
 armR.rotation.x=-.55+hit*1.35;armR.rotation.z=-.18;armL.rotation.x=-.2+hit*.2;legL.rotation.x=Math.sin(elapsed*2.4)*.07;legR.rotation.x=-legL.rotation.x;torso.position.y=hit*.045;
 cart.position.x=2.65+Math.sin(elapsed*.45)*.13;cart.rotation.y=Math.sin(elapsed*.45)*.025;point.intensity=35+Math.sin(elapsed*4)*3;
 dusts.forEach((p,i)=>{p.position.y+=dt*(.08+(i%4)*.025);if(p.position.y>5.7)p.position.y=.2;});
