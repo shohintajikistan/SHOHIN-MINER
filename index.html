@@ -54,8 +54,7 @@ button:active{transform:scale(.97)}button.primary{background:linear-gradient(145
  try{
   status.textContent='ЗАГРУЗКА 3D ДВИЖКА…';
   await loadScript(['https://cdn.babylonjs.com/babylon.js','https://cdn.jsdelivr.net/npm/babylonjs@7.54.3/babylon.js']);
-  status.textContent='ЗАГРУЗКА 3D МОДУЛЕЙ…';
-  await loadScript(['https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js','https://cdn.jsdelivr.net/npm/babylonjs-loaders@7.54.3/babylonjs.loaders.min.js']);
+  status.textContent='ЗАПУСК ШАХТЫ…';
  }catch(error){
   console.error(error);
   status.textContent='ОШИБКА: НЕ УДАЛОСЬ ЗАГРУЗИТЬ 3D ДВИЖОК';
@@ -101,29 +100,9 @@ const orePile=new B.TransformNode('fresh ore pile',scene);orePile.position.set(-
 for(let i=0;i<9;i++){const c=B.MeshBuilder.CreatePolyhedron('loose ore',{type:1,size:.28+(i%3)*.07},scene);c.position.set(Math.sin(i*4)*.65,(i%3)*.12,Math.cos(i*3)*.35);c.material=i%2?emerald:gold;c.parent=orePile;}
 const dust=B.MeshBuilder.CreateSphere('dust particle',{diameter:.045,segments:4},scene);dust.material=material('dust','#d8c99a');const dusts=[];for(let i=0;i<45;i++){const p=dust.clone('dust '+i);p.position.set((Math.random()-.5)*12,Math.random()*5,(Math.random()-.5)*9);p.visibility=.5;dusts.push(p);}
 
-// Настоящий rigged GLB-гном. Процедурный персонаж остаётся резервом на случай ошибки сети.
-let dwarfRoot=null;
-const dwarfModelUrl='https://assets.stoicsoft.com/1designtool/3d/models/dwarf-miner/e195f91ccd/model.glb';
-// Загружаем внешний GLB не более 12 секунд. Если сервер медленный,
- // игра продолжает работу с процедурным гномом, не ожидая модель.
-(async()=>{
-  try{
-    const modelPromise=B.SceneLoader.ImportMeshAsync('', 'https://assets.stoicsoft.com/1designtool/3d/models/dwarf-miner/e195f91ccd/', 'model.glb', scene);
-    const timeoutPromise=new Promise((_,reject)=>setTimeout(()=>reject(new Error('Истекло время ожидания модели гнома')),12000));
-    const result=await Promise.race([modelPromise,timeoutPromise]);
-    const root=new B.TransformNode('SHOHIN real dwarf',scene);
-    result.meshes.forEach(mesh=>{if(!mesh.parent)mesh.parent=root;});
-    root.position.set(-1.7,0,-.25);
-    root.rotation.y=-2.55;
-    root.scaling.setAll(1.45);
-    dwarfRoot=root;
-    miner.setEnabled(false);
-    toast('3D-гном загружен в шахту');
-  }catch(err){
-    console.warn('GLB dwarf unavailable; using built-in miner.',err);
-    toast('Используется встроенный шахтёр');
-  }
-})();
+// Используем встроенного low-poly шахтёра. Внешние GLB-модули
+// отключены, чтобы игра запускалась без дополнительной загрузки.
+
 
 let mined=0,upgrade=0,depth=1,workRate=1,lastCount=0;
 function toast(message){const el=document.getElementById('toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1700);}
