@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#071c16">
+<title>SHOHIN MINER</title>
+<style>
+:root{--bg:#071c16;--panel:#0d3024;--green:#08a56c;--lime:#baf05b;--gold:#e7bd58;--cream:#f1ead7}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--cream);touch-action:none}
+#game{position:fixed;inset:0}canvas{display:block;width:100%;height:100%}
+.top{position:fixed;z-index:3;top:0;left:0;right:0;padding:14px 15px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(180deg,rgba(4,17,13,.88),transparent)}
+.brand{font-weight:900;letter-spacing:2px;font-size:15px}.brand small{display:block;color:var(--lime);font-size:9px;letter-spacing:3px;margin-top:2px}
+.pill{border:1px solid rgba(186,240,91,.35);background:rgba(7,28,22,.82);padding:8px 12px;border-radius:20px;font-size:11px;color:var(--lime)}
+.hint{position:fixed;z-index:2;top:78px;left:50%;transform:translateX(-50%);padding:7px 12px;border-radius:20px;background:rgba(7,28,22,.62);font-size:10px;color:#d6e6d9;white-space:nowrap}
+.bottom{position:fixed;z-index:3;bottom:0;left:0;right:0;padding:12px 14px max(16px,env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(4,17,13,.98) 65%,transparent);display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.stat{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:rgba(13,48,36,.9);border:1px solid rgba(186,240,91,.16);border-radius:13px;font-size:11px}
+.meter{height:5px;background:#203b30;border-radius:8px;overflow:hidden;width:38%;margin-left:auto;margin-right:9px}.meter i{display:block;height:100%;width:40%;background:var(--lime);border-radius:8px;transition:width .3s}
+button{border:1px solid rgba(186,240,91,.3);border-radius:13px;background:linear-gradient(145deg,#126044,#0b3b2c);color:white;padding:13px 9px;font-weight:750;font-size:12px;box-shadow:0 5px 15px #0005}
+button:active{transform:scale(.97)}button.primary{background:linear-gradient(145deg,#baf05b,#76b832);color:#102319;border:0}
+.toast{position:fixed;z-index:5;left:50%;bottom:150px;transform:translate(-50%,12px);opacity:0;transition:.25s;background:#102d22;border:1px solid #baf05b66;padding:10px 15px;border-radius:12px;font-size:12px;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}
+.loading{position:fixed;inset:0;z-index:10;background:#071c16;display:grid;place-items:center;transition:opacity .4s}.loading.hide{opacity:0;pointer-events:none}.loader{text-align:center;letter-spacing:3px;font-weight:900}.loader span{display:block;color:var(--lime);font-size:10px;margin-top:10px;letter-spacing:2px}
+@media(min-width:700px){.bottom{left:50%;right:auto;transform:translateX(-50%);width:min(480px,95vw);border-radius:20px 20px 0 0}.top{padding:20px 26px}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+<div id="game"></div>
+<div class="top"><div class="brand">SHOHIN MINER<small>TAJIKISTAN • UNDERGROUND</small></div><div class="pill" id="oreLabel">◆ РУДНАЯ ЖИЛА</div></div>
+<div class="hint">Проведите пальцем, чтобы осмотреть шахту</div>
+<div class="bottom">
+ <div class="stat"><span>ДОБЫЧА</span><div class="meter"><i id="progress"></i></div><b id="oreCount">РУДА: 0</b></div>
+ <button id="upgrade">⛏ УЛУЧШИТЬ КИРКУ</button><button class="primary" id="deeper">▼ ОТКРЫТЬ ГЛУБИНУ</button>
+</div>
+<div class="toast" id="toast"></div>
+<div class="loading" id="loading"><div class="loader">SHOHIN MINER<span>ЗАГРУЗКА ШАХТЫ</span></div></div>
+<script type="module">
+import * as THREE from 'three';
+const host=document.querySelector('#game');
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x101e19);scene.fog=new THREE.Fog(0x101e19,18,36);
+const camera=new THREE.OrthographicCamera(-9,9,9,-9,.1,100);camera.position.set(12,13,16);camera.lookAt(0,1,0);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;host.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xb9d8c8,0x30251b,2.0));
+const key=new THREE.DirectionalLight(0xffdca0,3.2);key.position.set(7,13,8);key.castShadow=true;key.shadow.mapSize.set(1024,1024);scene.add(key);
+const lamp=new THREE.PointLight(0xffc66b,24,12);lamp.position.set(0,4,2);scene.add(lamp);
+const mat=(c,r=.9,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
+const rock=mat(0x35463d),rock2=mat(0x26372f),floorMat=mat(0x4a4538),wood=mat(0x79502f),woodLight=mat(0x9c7041),iron=mat(0x69766f,.45,.65),gold=mat(0xd9a83f,.35,.45),crystal=mat(0x36c995,.28,.2),dark=mat(0x15231d);
+function box(parent,x,y,z,sx,sy,sz,material,rot=0){const o=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),material);o.position.set(x,y,z);o.rotation.y=rot;o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
+function beam(parent,a,b,r,material){const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),d=B.clone().sub(A);const o=new THREE.Mesh(new THREE.CylinderGeometry(r,r,d.length(),6),material);o.position.copy(A.add(B).multiplyScalar(.5));o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());o.castShadow=true;parent.add(o);return o}
+// Floating underground chamber and rock walls
+box(scene,0,-.38,0,15,.7,12,floorMat);
+box(scene,0,3.5,-5.9,15,7,.5,rock);box(scene,-7.3,3.5,0,.5,7,12,rock2);box(scene,7.3,3.5,0,.5,7,12,rock2);
+const ceiling=new THREE.Mesh(new THREE.BoxGeometry(15,.45,12),rock2);ceiling.position.set(0,7,-0.1);scene.add(ceiling);
+// Faceted ore veins
+for(let i=0;i<18;i++){const x=-5.8+(i%6)*2.15,z=-4.9+Math.floor(i/6)*1.25;const g=new THREE.Mesh(new THREE.OctahedronGeometry(.28+Math.random()*.22,0),i%3?crystal:gold);g.position.set(x,.05+Math.random()*.25,z);g.rotation.set(Math.random(),Math.random(),Math.random());g.castShadow=true;scene.add(g)}
+// timber supports
+for(let z=-4.5;z<=3.2;z+=2.5){box(scene,-4.8,2.5,z,.22,5,.25,wood);box(scene,4.8,2.5,z,.22,5,.25,wood);box(scene,0,4.95,z,9.8,.25,.28,woodLight);}
+// rails and sleepers
+for(let z=1.5;z<6;z+=.55){box(scene,0,-.01,z,3.6,.13,.22,woodLight)}
+for(const x of [-1.35,1.35])box(scene,x,.13,3.7,.13,.22,5.2,iron);
+// cart
+const cart=new THREE.Group();scene.add(cart);cart.position.set(2.65,.3,3.15);
+box(cart,0,.48,0,1.55,.7,1.2,iron);box(cart,0,.88,0,1.35,.15,1.0,gold);
+for(const x of [-.55,.55])for(const z of [-.43,.43]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.16,12),dark);w.rotation.z=Math.PI/2;w.position.set(x,.16,z);cart.add(w)}
+// Miner character assembled from shaped low-poly parts with animated limbs
+const miner=new THREE.Group();scene.add(miner);miner.position.set(-1.7,.05,-.25);
+const torso=new THREE.Group();miner.add(torso);
+const body=mat(0x277b58),skin=mat(0xd99c70),pants=mat(0x34463f),helmet=mat(0xe4b63f),boot=mat(0x302b25);
+box(torso,0,1.35,0,.68,.85,.42,body);box(torso,0,1.95,0,.57,.18,.48,helmet);
+const head=new THREE.Mesh(new THREE.SphereGeometry(.34,8,6),skin);head.position.set(0,1.95,.02);head.castShadow=true;torso.add(head);
+const brim=box(torso,0,2.16,.05,.78,.1,.62,helmet);const lampMesh=new THREE.Mesh(new THREE.SphereGeometry(.11,8,6),mat(0xfff0a2,.2));lampMesh.position.set(0,2.2,.36);torso.add(lampMesh);
+const legL=new THREE.Group(),legR=new THREE.Group();legL.position.set(-.2,.95,0);legR.position.set(.2,.95,0);miner.add(legL,legR);
+for(const [g,x] of [[legL,-.02],[legR,.02]]){box(g,0,-.28,0,.27,.62,.3,pants);box(g,0,-.58,.1,.34,.18,.48,boot)}
+const armL=new THREE.Group(),armR=new THREE.Group();armL.position.set(-.4,1.65,0);armR.position.set(.4,1.65,0);miner.add(armL,armR);
+box(armL,0,-.28,0,.22,.62,.24,body);box(armR,0,-.28,0,.22,.62,.24,body);
+const pick=new THREE.Group();pick.position.set(.02,-.58,.1);armR.add(pick);
+beam(pick,[0,-.4,0],[0,.65,0],.055,woodLight);beam(pick,[-.38,.52,0],[.38,.52,0],.07,iron);
+// decorative beard
+const beard=new THREE.Mesh(new THREE.ConeGeometry(.22,.48,6),mat(0x493326));beard.position.set(0,1.65,.3);beard.rotation.x=-.12;torso.add(beard);
+// glowing work spot
+const workLight=new THREE.PointLight(0x72ffc0,4,5);workLight.position.set(-2,2,-1);scene.add(workLight);
+// crystal clusters in the working face
+const cluster=new THREE.Group();scene.add(cluster);cluster.position.set(-3.2,.2,-2.5);
+for(let i=0;i<7;i++){const c=new THREE.Mesh(new THREE.OctahedronGeometry(.3+Math.random()*.22,0),i%2?crystal:gold);c.position.set((Math.random()-.5)*1.5,Math.random()*.55,(Math.random()-.5)*.7);c.rotation.set(Math.random(),Math.random(),Math.random());c.castShadow=true;cluster.add(c)}
+// ambient particles
+const dustGeo=new THREE.BufferGeometry(),dust=[];for(let i=0;i<100;i++)dust.push((Math.random()-.5)*13,Math.random()*5,(Math.random()-.5)*9);dustGeo.setAttribute('position',new THREE.Float32BufferAttribute(dust,3));const dusts=new THREE.Points(dustGeo,new THREE.PointsMaterial({color:0xd8c99a,size:.035,transparent:true,opacity:.4}));scene.add(dusts);
+let mined=0,level=1,speed=1,clock=new THREE.Clock(),drag=false,lastX=0,rot=0;
+function toast(t){const e=document.querySelector('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1700)}
+document.querySelector('#upgrade').onclick=()=>{if(level<5){level++;speed+=.45;toast('Кирка улучшена. Шахтёр работает быстрее.')}else toast('Кирка уже улучшена до максимума.')};
+document.querySelector('#deeper').onclick=()=>{if(level<2){level=2;cluster.position.x=-2.3;toast('Новая рудная жила открыта!')}else{toast('Следующий участок скоро будет доступен.')}};
+renderer.domElement.addEventListener('pointerdown',e=>{drag=true;lastX=e.clientX});window.addEventListener('pointerup',()=>drag=false);window.addEventListener('pointermove',e=>{if(drag){rot+=(e.clientX-lastX)*.006;lastX=e.clientX}});
+function resize(){const w=innerWidth,h=innerHeight,aspect=w/h;const size=aspect<.8?9.7:8.2;camera.left=-size*aspect/1.15;camera.right=size*aspect/1.15;camera.top=size;camera.bottom=-size;camera.updateProjectionMatrix();renderer.setSize(w,h)}window.addEventListener('resize',resize);resize();
+function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime(),s=speed;
+const swing=Math.sin(t*3.3*s);armR.rotation.x=-.55+Math.max(0,swing)*1.35;armR.rotation.z=-.2;armL.rotation.x=-.25+Math.max(0,swing)*.22;legL.rotation.x=Math.sin(t*2.4)*.08;legR.rotation.x=-legL.rotation.x;torso.position.y=Math.max(0,swing)*.045;
+miner.rotation.y=rot*.18;cart.position.x=2.65+Math.sin(t*.4)*.12;lamp.intensity=22+Math.sin(t*4)*2;dusts.rotation.y=t*.012;
+if(Math.floor(t*speed*1.25)>mined){mined++;document.querySelector('#oreCount').textContent='РУДА: '+mined;document.querySelector('#progress').style.width=(mined%10)*10+'%';if(mined%10===0)toast('Вагонетка наполняется рудой');}
+renderer.render(scene,camera)}
+animate();setTimeout(()=>document.querySelector('#loading').classList.add('hide'),650);
+</script>
+</body></html>
