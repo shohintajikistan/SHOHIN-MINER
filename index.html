@@ -104,19 +104,26 @@ const dust=B.MeshBuilder.CreateSphere('dust particle',{diameter:.045,segments:4}
 // Настоящий rigged GLB-гном. Процедурный персонаж остаётся резервом на случай ошибки сети.
 let dwarfRoot=null;
 const dwarfModelUrl='https://assets.stoicsoft.com/1designtool/3d/models/dwarf-miner/e195f91ccd/model.glb';
-B.SceneLoader.ImportMeshAsync('', 'https://assets.stoicsoft.com/1designtool/3d/models/dwarf-miner/e195f91ccd/', 'model.glb', scene)
-.then(result=>{
-  const root=new B.TransformNode('SHOHIN real dwarf',scene);
-  result.meshes.forEach(mesh=>{if(!mesh.parent)mesh.parent=root;});
-  root.position.set(-1.7,0,-.25);
-  root.rotation.y=-2.55;
-  root.scaling.setAll(1.45);
-  dwarfRoot=root;
-  miner.setEnabled(false);
-  // Небольшая idle-анимация корпуса; полноценный цикл удара киркой добавим после проверки костей модели.
-  toast('3D-гном загружен в шахту');
-})
-.catch(err=>console.warn('Dwarf GLB could not be loaded; procedural miner remains active.',err));
+// Загружаем внешний GLB не более 12 секунд. Если сервер медленный,
+ // игра продолжает работу с процедурным гномом, не ожидая модель.
+(async()=>{
+  try{
+    const modelPromise=B.SceneLoader.ImportMeshAsync('', 'https://assets.stoicsoft.com/1designtool/3d/models/dwarf-miner/e195f91ccd/', 'model.glb', scene);
+    const timeoutPromise=new Promise((_,reject)=>setTimeout(()=>reject(new Error('Истекло время ожидания модели гнома')),12000));
+    const result=await Promise.race([modelPromise,timeoutPromise]);
+    const root=new B.TransformNode('SHOHIN real dwarf',scene);
+    result.meshes.forEach(mesh=>{if(!mesh.parent)mesh.parent=root;});
+    root.position.set(-1.7,0,-.25);
+    root.rotation.y=-2.55;
+    root.scaling.setAll(1.45);
+    dwarfRoot=root;
+    miner.setEnabled(false);
+    toast('3D-гном загружен в шахту');
+  }catch(err){
+    console.warn('GLB dwarf unavailable; using built-in miner.',err);
+    toast('Используется встроенный шахтёр');
+  }
+})();
 
 let mined=0,upgrade=0,depth=1,workRate=1,lastCount=0;
 function toast(message){const el=document.getElementById('toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1700);}
