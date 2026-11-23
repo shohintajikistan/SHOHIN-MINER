@@ -1,126 +1,96 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#071c16">
-<title>SHOHIN MINER</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#071c16"><title>SHOHIN MINER</title>
 <style>
 :root{--bg:#071c16;--panel:#0d3024;--green:#08a56c;--lime:#baf05b;--gold:#e7bd58;--cream:#f1ead7}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:system-ui, sans-serif;color:var(--cream);touch-action:none}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:system-ui,sans-serif;color:var(--cream);touch-action:none}
 #renderCanvas{width:100%;height:100%;display:block;touch-action:none;outline:0}
-.top{position:fixed;z-index:3;top:0;left:0;right:0;padding:14px 15px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(180deg,#04110de8,transparent);pointer-events:none}
+.top{position:fixed;z-index:3;top:0;left:0;right:0;padding:13px 15px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(180deg,#04110df0,transparent);pointer-events:none}
 .brand{font-weight:900;letter-spacing:2px;font-size:15px}.brand small{display:block;color:var(--lime);font-size:9px;letter-spacing:3px;margin-top:2px}
-.pill{border:1px solid #baf05b55;background:#071c16d9;padding:8px 12px;border-radius:20px;font-size:11px;color:var(--lime)}
-.hint{position:fixed;z-index:2;top:78px;left:50%;transform:translateX(-50%);padding:7px 12px;border-radius:20px;background:#071c1699;font-size:10px;color:#d6e6d9;white-space:nowrap;pointer-events:none}
-.bottom{position:fixed;z-index:3;bottom:0;left:0;right:0;padding:12px 14px max(16px,env(safe-area-inset-bottom));background:linear-gradient(0deg,#04110df5 65%,transparent);display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.stat{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#0d3024e8;border:1px solid #baf05b2b;border-radius:13px;font-size:11px}
-.meter{height:5px;background:#203b30;border-radius:8px;overflow:hidden;width:38%;margin-left:auto;margin-right:9px}.meter i{display:block;height:100%;width:0;background:var(--lime);border-radius:8px;transition:width .3s}
-button{border:1px solid #baf05b55;border-radius:13px;background:linear-gradient(145deg,#126044,#0b3b2c);color:white;padding:13px 9px;font-weight:750;font-size:12px}
+.pill{border:1px solid #baf05b55;background:#071c16dc;padding:8px 11px;border-radius:20px;font-size:10px;color:var(--lime)}
+.hint{position:fixed;z-index:2;top:73px;left:50%;transform:translateX(-50%);padding:7px 12px;border-radius:20px;background:#071c1699;font-size:10px;color:#e0e8dc;white-space:nowrap;pointer-events:none}
+.bottom{position:fixed;z-index:3;bottom:0;left:0;right:0;padding:10px 12px max(14px,env(safe-area-inset-bottom));background:linear-gradient(0deg,#04110df5 72%,transparent);display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#0d3024ed;border:1px solid #baf05b35;border-radius:12px;font-size:11px}
+button{border:1px solid #baf05b55;border-radius:12px;background:linear-gradient(145deg,#126044,#0b3b2c);color:white;padding:12px 8px;font-weight:750;font-size:11px}
 button:active{transform:scale(.97)}button.primary{background:linear-gradient(145deg,#baf05b,#76b832);color:#102319;border:0}
-.toast{position:fixed;z-index:5;left:50%;bottom:150px;transform:translate(-50%,12px);opacity:0;transition:.25s;background:#102d22;border:1px solid #baf05b66;padding:10px 15px;border-radius:12px;font-size:12px;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast{position:fixed;z-index:5;left:50%;bottom:145px;transform:translate(-50%,12px);opacity:0;transition:.25s;background:#102d22;border:1px solid #baf05b66;padding:10px 15px;border-radius:12px;font-size:12px;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}
 .loading{position:fixed;inset:0;z-index:10;background:#071c16;display:grid;place-items:center;transition:opacity .4s}.loading.hide{opacity:0;pointer-events:none}.loader{text-align:center;letter-spacing:3px;font-weight:900}.loader span{display:block;color:var(--lime);font-size:10px;margin-top:10px;letter-spacing:2px}
-@media(min-width:700px){.bottom{left:50%;right:auto;transform:translateX(-50%);width:min(480px,95vw);border-radius:20px 20px 0 0}.top{padding:20px 26px}}
-</style>
-</head>
-<body>
+@media(min-width:700px){.bottom{left:50%;right:auto;transform:translateX(-50%);width:min(490px,95vw);border-radius:18px 18px 0 0}.top{padding:18px 25px}}
+</style></head><body>
 <canvas id="renderCanvas"></canvas>
-<div class="top"><div class="brand">SHOHIN MINER<small>TAJIKISTAN • UNDERGROUND</small></div><div class="pill">◆ РУДНАЯ ЖИЛА</div></div>
-<div class="hint">Проведите пальцем, чтобы осмотреть шахту</div>
-<div class="bottom">
- <div class="stat"><span>ДОБЫЧА</span><div class="meter"><i id="progress"></i></div><b id="oreCount">РУДА: 0</b></div>
- <button id="upgrade">⛏ УЛУЧШИТЬ КИРКУ</button><button class="primary" id="deeper">▼ ОТКРЫТЬ ГЛУБИНУ</button>
-</div>
-<div class="toast" id="toast"></div>
-<div class="loading" id="loading"><div class="loader">SHOHIN MINER<span>ЗАГРУЗКА BABYLON 3D</span></div></div>
+<div class="top"><div class="brand">SHOHIN MINER<small>TAJIKISTAN • COAL MINE</small></div><div class="pill" id="level">ШАХТА • УРОВЕНЬ 1</div></div>
+<div class="hint">Вращай пространство пальцем • приближай двумя пальцами</div>
+<div class="bottom"><div class="stat"><span>ДЕНЬГИ: <b id="money">0</b> ◆</span><span>УГОЛЬ: <b id="coal">0</b> т</span><span>ЭТАЖИ: <b id="floors">2</b></span></div>
+<button id="liftBtn">УЛУЧШИТЬ ЛИФТ • 25 ◆</button><button class="primary" id="floorBtn">ОТКРЫТЬ ЭТАЖ • 60 ◆</button></div>
+<div class="toast" id="toast"></div><div class="loading" id="loading"><div class="loader">SHOHIN MINER<span>ЗАГРУЗКА 3D МИРА…</span></div></div>
 <script>
 (async()=>{
  const status=document.querySelector('.loader span');
- function loadScript(urls){
-  return new Promise((resolve,reject)=>{
-   let i=0;
-   const next=()=>{
-    if(i>=urls.length){reject(new Error('Не удалось загрузить библиотеку: '+urls.join(' | ')));return;}
-    const script=document.createElement('script');
-    script.src=urls[i++];script.async=true;
-    const timer=setTimeout(()=>{script.remove();next();},15000);
-    script.onload=()=>{clearTimeout(timer);resolve();};
-    script.onerror=()=>{clearTimeout(timer);script.remove();next();};
-    document.head.appendChild(script);
-   };
-   next();
-  });
- }
- try{
-  status.textContent='ЗАГРУЗКА 3D ДВИЖКА…';
-  await loadScript(['https://cdn.babylonjs.com/babylon.js','https://cdn.jsdelivr.net/npm/babylonjs@7.54.3/babylon.js']);
-  status.textContent='ЗАПУСК ШАХТЫ…';
- }catch(error){
-  console.error(error);
-  status.textContent='ОШИБКА: НЕ УДАЛОСЬ ЗАГРУЗИТЬ 3D ДВИЖОК';
-  return;
- }
- (()=>{
-
-'use strict';
-const canvas=document.getElementById('renderCanvas');
-if(!window.BABYLON){document.querySelector('.loader span').textContent='ОШИБКА ЗАГРУЗКИ 3D ДВИЖКА';return;}
-const B= BABYLON, engine=new B.Engine(canvas,true,{preserveDrawingBuffer:false,stencil:true,adaptToDeviceRatio:true});
-const scene=new B.Scene(engine);scene.clearColor=new B.Color4(.035,.075,.06,1);scene.fogMode=B.Scene.FOGMODE_EXP2;scene.fogDensity=.018;scene.fogColor=new B.Color3(.035,.075,.06);
-const camera=new B.ArcRotateCamera('mineCamera',-Math.PI/3.1,1.08,17,new B.Vector3(0,1.5,0),scene);
-camera.lowerRadiusLimit=13;camera.upperRadiusLimit=22;camera.lowerBetaLimit=.75;camera.upperBetaLimit=1.35;camera.wheelPrecision=65;camera.panningSensibility=0;camera.attachControl(canvas,true);camera.inputs.removeByType('ArcRotateCameraKeyboardMoveInput');
-const hemi=new B.HemisphericLight('softAmbient',new B.Vector3(0,1,0),.82);hemi.groundColor=new B.Color3(.16,.12,.08);
-const sun=new B.DirectionalLight('warmMineLight',new B.Vector3(-.5,-1,.35),1.15);sun.position=new B.Vector3(7,12,-8);
-const point=new B.PointLight('minersLamp',new B.Vector3(-1,3,1),scene);point.diffuse=new B.Color3(1,.72,.35);point.intensity=38;point.range=13;
-function material(name,color,rough=.9,metal=0){const m=new B.StandardMaterial(name,scene);m.diffuseColor=B.Color3.FromHexString(color);m.specularColor=new B.Color3(.12,.12,.12);m.roughness=rough;m.metallic=metal;return m;}
-const stone=material('deep slate','#34463d'),stoneDark=material('shadow rock','#26372f'),floorMat=material('mine floor','#514a3b'),timber=material('old timber','#805532'),timberGold=material('cut timber','#a47745'),steel=material('aged steel','#77847c',.35,.65),gold=material('gold ore','#dca93d',.3,.25),emerald=material('emerald ore','#26bd83',.25,.25),dark=material('wheel rubber','#1c2924'),shirt=material('miner jacket','#23845d'),skin=material('skin','#d89b70'),pants=material('trousers','#35483e'),helmet=material('helmet brass','#e7b842',.35,.15),beardMat=material('beard','#4b3024'),bootMat=material('boots','#302a24');
-function box(name,pos,scale,mat,parent=scene){const m=B.MeshBuilder.CreateBox(name,{width:scale[0],height:scale[1],depth:scale[2]},scene);m.position.set(...pos);m.scaling.set(1,1,1);m.material=mat;m.parent=parent;m.receiveShadows=true;return m;}
-function sphere(name,pos,diam,mat,parent=scene,segments=8){const m=B.MeshBuilder.CreateSphere(name,{diameter:diam,segments},scene);m.position.set(...pos);m.material=mat;m.parent=parent;return m;}
-function cylinder(name,pos,height,diam,mat,parent=scene,segments=8){const m=B.MeshBuilder.CreateCylinder(name,{height,diameter:diam,tessellation:segments},scene);m.position.set(...pos);m.material=mat;m.parent=parent;return m;}
-function beam(name,a,b,r,mat,parent=scene){const A=new B.Vector3(...a),C=new B.Vector3(...b),d=C.subtract(A);const m=cylinder(name,A.add(C).scale(.5).asArray(),d.length(),r*2,mat,parent,6);m.rotationQuaternion=B.Quaternion.FromUnitVectors(new B.Vector3(0,1,0),d.normalize());return m;}
-const ground=box('mine platform',[0,-.4,0],[15,.7,12],floorMat);
-box('back rock wall',[0,3.3,-5.9],[15,7,.5],stone);box('left rock wall',[-7.3,3.3,0],[.5,7,12],stoneDark);box('right rock wall',[7.3,3.3,0],[.5,7,12],stoneDark);box('rock ceiling',[0,7,-.1],[15,.45,12],stoneDark);
-for(let z=-4.5;z<=3.2;z+=2.5){box('timber post L',[-4.8,2.5,z],[.22,5,.25],timber);box('timber post R',[4.8,2.5,z],[.22,5,.25],timber);box('timber crossbeam',[0,4.95,z],[9.8,.25,.28],timberGold);}
-for(let z=1.5;z<6;z+=.55)box('rail sleeper',[0,-.01,z],[3.6,.13,.22],timberGold);
-for(const x of [-1.35,1.35])box('steel rail',[x,.13,3.7],[.13,.22,5.2],steel);
-for(let i=0;i<20;i++){const x=-5.8+(i%7)*1.8,z=-4.9+Math.floor(i/7)*1.3;const ore=B.MeshBuilder.CreatePolyhedron('wall ore',{type:1,size:.3+(i%3)*.08},scene);ore.position.set(x,.05+(i%4)*.11,z);ore.material=i%3===0?gold:emerald;ore.rotation.set(i*.3,i*.7,i*.2);}
-const cart=new B.TransformNode('ore cart',scene);cart.position.set(2.65,.28,3.15);
-box('cart body',[0,.45,0],[1.55,.7,1.2],steel,cart);box('cart rim',[0,.84,0],[1.45,.12,1.1],gold,cart);
-for(const x of [-.57,.57])for(const z of [-.43,.43]){const w=cylinder('cart wheel',[x,.13,z],.16,.42,dark,cart,12);w.rotation.z=Math.PI/2;}
-const miner=new B.TransformNode('dwarf miner',scene);miner.position.set(-1.7,.03,-.25);
-const torso=new B.TransformNode('miner torso',scene);torso.parent=miner;
-box('jacket',[0,1.35,0],[.68,.85,.42],shirt,torso);sphere('miner head',[0,1.96,.03],.66,skin,torso,8);box('helmet cap',[0,2.25,0],[.62,.18,.55],helmet,torso);box('helmet brim',[0,2.17,.12],[.82,.09,.68],helmet,torso);sphere('helmet lamp',[0,2.25,.42],.2,material('lamp glow','#fff0a2',.2),torso);
-const beard=B.MeshBuilder.CreateCylinder('dwarf beard',{height:.48,diameterTop:0,diameterBottom:.42,tessellation:6},scene);beard.position.set(0,1.68,.29);beard.material=beardMat;beard.parent=torso;
-function limb(name,x,y,mat){const pivot=new B.TransformNode(name,scene);pivot.position.set(x,y,0);pivot.parent=miner;box(name+' segment',[0,-.29,0],[.25,.62,.27],mat,pivot);return pivot;}
-const legL=limb('left leg',-.2,.96,pants),legR=limb('right leg',.2,.96,pants);
-box('left boot',[0,-.59,.1],[.34,.18,.48],bootMat,legL);box('right boot',[0,-.59,.1],[.34,.18,.48],bootMat,legR);
-const armL=limb('left arm',-.4,1.65,shirt),armR=limb('right arm',.4,1.65,shirt);
-const pick=new B.TransformNode('pickaxe',scene);pick.position.set(.02,-.58,.1);pick.parent=armR;beam('wooden pick handle',[0,-.4,0],[0,.65,0],.055,timberGold,pick);beam('iron pick head',[-.38,.52,0],[.38,.52,0],.07,steel,pick);
-const orePile=new B.TransformNode('fresh ore pile',scene);orePile.position.set(-3.2,.1,-2.5);
-for(let i=0;i<9;i++){const c=B.MeshBuilder.CreatePolyhedron('loose ore',{type:1,size:.28+(i%3)*.07},scene);c.position.set(Math.sin(i*4)*.65,(i%3)*.12,Math.cos(i*3)*.35);c.material=i%2?emerald:gold;c.parent=orePile;}
-const dust=B.MeshBuilder.CreateSphere('dust particle',{diameter:.045,segments:4},scene);dust.material=material('dust','#d8c99a');const dusts=[];for(let i=0;i<45;i++){const p=dust.clone('dust '+i);p.position.set((Math.random()-.5)*12,Math.random()*5,(Math.random()-.5)*9);p.visibility=.5;dusts.push(p);}
-
-// Используем встроенного low-poly шахтёра. Внешние GLB-модули
-// отключены, чтобы игра запускалась без дополнительной загрузки.
-
-
-let mined=0,upgrade=0,depth=1,workRate=1,lastCount=0;
-function toast(message){const el=document.getElementById('toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1700);}
-document.getElementById('upgrade').onclick=()=>{if(upgrade<5){upgrade++;workRate+=.45;toast('Кирка улучшена. Скорость добычи выросла.');}else toast('Максимальный уровень кирки.');};
-document.getElementById('deeper').onclick=()=>{if(depth===1){depth=2;orePile.position.x=-2.2;toast('Новая рудная жила открыта!');}else toast('Следующий участок шахты строится.');};
-let elapsed=0;
-scene.onBeforeRenderObservable.add(()=>{
-const dt=engine.getDeltaTime()/1000;elapsed+=dt;const swing=Math.sin(elapsed*3.2*workRate),hit=Math.max(0,swing);if(dwarfRoot){dwarfRoot.position.y=Math.sin(elapsed*2.1)*.025;dwarfRoot.rotation.y=-2.55+Math.sin(elapsed*1.2)*.025;}
-armR.rotation.x=-.55+hit*1.35;armR.rotation.z=-.18;armL.rotation.x=-.2+hit*.2;legL.rotation.x=Math.sin(elapsed*2.4)*.07;legR.rotation.x=-legL.rotation.x;torso.position.y=hit*.045;
-cart.position.x=2.65+Math.sin(elapsed*.45)*.13;cart.rotation.y=Math.sin(elapsed*.45)*.025;point.intensity=35+Math.sin(elapsed*4)*3;
-dusts.forEach((p,i)=>{p.position.y+=dt*(.08+(i%4)*.025);if(p.position.y>5.7)p.position.y=.2;});
-mined+=dt*.95*workRate;if(Math.floor(mined)!==lastCount){lastCount=Math.floor(mined);document.getElementById('oreCount').textContent='РУДА: '+lastCount;document.getElementById('progress').style.width=(lastCount%10)*10+'%';if(lastCount>0&&lastCount%10===0)toast('Вагонетка наполняется рудой');}
-});
-engine.runRenderLoop(()=>scene.render());
-window.addEventListener('resize',()=>engine.resize());
-setTimeout(()=>document.getElementById('loading').classList.add('hide'),1200);
+ const load=(urls)=>new Promise((resolve,reject)=>{let i=0;function next(){if(i>=urls.length)return reject(Error('3D engine unavailable'));const s=document.createElement('script');s.src=urls[i++];s.onload=resolve;s.onerror=()=>{s.remove();next()};document.head.appendChild(s)}next()});
+ try{await load(['https://cdn.babylonjs.com/babylon.js','https://cdn.jsdelivr.net/npm/babylonjs@7.54.3/babylon.js'])}catch(e){status.textContent='НЕТ СОЕДИНЕНИЯ С 3D ДВИЖКОМ';return}
+ const B=BABYLON,canvas=document.getElementById('renderCanvas'),engine=new B.Engine(canvas,true,{preserveDrawingBuffer:false,stencil:true,adaptToDeviceRatio:true});
+ const scene=new B.Scene(engine);scene.clearColor=new B.Color4(.48,.68,.76,1);scene.ambientColor=new B.Color3(.3,.3,.3);
+ const camera=new B.ArcRotateCamera('camera',-Math.PI/3,1.12,19,new B.Vector3(0,-1.4,0),scene);camera.lowerRadiusLimit=11;camera.upperRadiusLimit=28;camera.lowerBetaLimit=.65;camera.upperBetaLimit=1.42;camera.wheelPrecision=55;camera.panningSensibility=0;camera.attachControl(canvas,true);camera.inputs.removeByType('ArcRotateCameraKeyboardMoveInput');
+ const hemi=new B.HemisphericLight('sky',new B.Vector3(0,1,0),.95);hemi.groundColor=new B.Color3(.22,.18,.12);const sun=new B.DirectionalLight('sun',new B.Vector3(-.5,-1,.4),1.25);sun.position=new B.Vector3(8,12,-10);
+ const mat=(n,c,rough=.85,metal=0)=>{const m=new B.StandardMaterial(n,scene);m.diffuseColor=B.Color3.FromHexString(c);m.specularColor=new B.Color3(.12,.12,.12);m.roughness=rough;m.metallic=metal;return m};
+ const grass=mat('grass','#75a94b'),soil=mat('earth','#795238'),soil2=mat('earth shadow','#543b2b'),rock=mat('rock','#4b514b'),rock2=mat('dark rock','#303a35'),wood=mat('wood','#80512e'),wood2=mat('wood light','#a87543'),metal=mat('steel','#87938c',.38,.55),roof=mat('roof','#315c49'),wall=mat('building','#d9c69b'),wall2=mat('wall shade','#b49b70'),coal=mat('coal','#252a29',.6),coal2=mat('coal shine','#49514b',.4),gold=mat('gold','#d6a53c',.3,.2),glass=mat('window','#7bb8bd',.25,.1),lamp=mat('lamp','#ffe39a',.2);
+ const box=(n,p,s,m,parent=scene)=>{const o=B.MeshBuilder.CreateBox(n,{width:s[0],height:s[1],depth:s[2]},scene);o.position.set(...p);o.material=m;o.parent=parent;return o};
+ const cyl=(n,p,h,d,m,parent=scene,seg=10)=>{const o=B.MeshBuilder.CreateCylinder(n,{height:h,diameter:d,tessellation:seg},scene);o.position.set(...p);o.material=m;o.parent=parent;return o};
+ const sphere=(n,p,d,m,parent=scene)=>{const o=B.MeshBuilder.CreateSphere(n,{diameter:d,segments:7},scene);o.position.set(...p);o.material=m;o.parent=parent;return o};
+ const beam=(n,a,b,r,m,parent=scene)=>{const A=new B.Vector3(...a),C=new B.Vector3(...b),v=C.subtract(A);const o=cyl(n,A.add(C).scale(.5).asArray(),v.length(),r*2,m,parent,6);o.rotationQuaternion=B.Quaternion.FromUnitVectors(new B.Vector3(0,1,0),v.normalize());return o};
+ // Cutaway ground: two small buildings above, exposed underground levels below.
+ box('earth mass',[0,-4.25,0],[13,8.5,8],soil);box('front cut rock',[0,-4.1,4.04],[13,8.2,.18],rock);box('right cut rock',[6.55,-4.2,0],[.18,8.3,8],rock2);
+ box('grass top',[0,.12,0],[13,.3,8.2],grass);box('front grass edge',[0,-.02,4.12],[13,.16,.18],grass);
+ // Small lift house on surface.
+ box('lift house base',[-2.45,.9,0],[2.15,1.45,2.1],wall);box('lift house front',[-2.45,.9,1.07],[2.15,1.35,.08],wall2);
+ box('lift house roof',[-2.45,1.75,0],[2.5,.22,2.45],roof);box('lift door',[-2.45,.67,1.13],[.72,1.05,.08],wood);
+ box('lift window',[-3.05,1.15,1.13],[.38,.36,.06],glass);box('lift window',[-1.85,1.15,1.13],[.38,.36,.06],glass);
+ // Processing house, same modest scale.
+ box('processing base',[2.8,.92,0],[2.55,1.5,2.25],wall);box('processing front',[2.8,.92,1.15],[2.55,1.4,.08],wall2);
+ box('processing roof',[2.8,1.78,0],[2.85,.22,2.55],roof);box('factory door',[2.8,.62,1.2],[.62,.95,.07],wood);
+ for(const x of [2.05,3.55])box('factory window',[x,1.18,1.2],[.42,.38,.07],glass);
+ // Tiny chimney and coal conveyor: details attached to processing building.
+ box('chimney',[3.65,2.22,-.45],[.34,.95,.34],rock);box('chimney cap',[3.65,2.72,-.45],[.48,.12,.48],metal);
+ // Vertical elevator shaft below the lift house.
+ const shaftX=-2.45;box('shaft left rail',[shaftX-.48,-4.05,.15],[.13,7.8,.16],metal);box('shaft right rail',[shaftX+.48,-4.05,.15],[.13,7.8,.16],metal);
+ for(let y=-.4;y>-7.8;y-=.55)box('ladder rung',[shaftX,y,.18],[.9,.07,.12],wood2);
+ // Underground galleries: all connected to one central shaft, extending right.
+ const floorYs=[-2.1,-4.35,-6.6];const galleryMeshes=[];
+ floorYs.forEach((y,i)=>{box('gallery tunnel '+i,[.75,y,0],[5.9,1.28,2.7],rock2);box('gallery floor '+i,[.75,y-.62,.05],[6.0,.16,2.8],soil2);box('gallery roof '+i,[.75,y+.62,.05],[6,.13,2.8],rock);
+   for(const z of [-1.25,1.25]){box('gallery timber post',[.2,y,z],[.16,1.18,.16],wood);box('gallery timber post',[1.9,y,z],[.16,1.18,.16],wood);box('gallery support beam',[1.05,y+.52,z],[1.85,.14,.14],wood2)}
+   // track and mine cart in each tunnel
+   for(const z of [-.38,.38])box('rail '+i,[1.55,y-.48,z],[4.5,.09,.09],metal);
+   for(let x=-.5;x<3.7;x+=.48)box('sleeper '+i,[x,y-.54,0],[.13,.08,1.05],wood2);
+   const cart=new B.TransformNode('coal cart '+i,scene);cart.position.set(1.1,y-.25,0);galleryMeshes.push(cart);
+   box('cart tub',[0,.25,0],[.95,.48,.75],metal,cart);box('cart coal',[0,.53,0],[.72,.25,.55],coal,cart);
+   for(const xx of [-.32,.32])for(const zz of [-.34,.34]){const w=cyl('cart wheel',[xx,.03,zz],.12,.27,coal,cart,10);w.rotation.z=Math.PI/2}
+   // coal pile at the far end of each gallery
+   for(let k=0;k<7;k++){const c=sphere('coal chunk',[3.35+(k%3)*.22,y-.25+Math.floor(k/3)*.16,-.55+(k%2)*.7],.28,coal2);c.scaling.y=.72}
+ });
+ // Elevator cage moves inside the single vertical shaft.
+ const cage=new B.TransformNode('elevator cage',scene);cage.position.set(shaftX,-1.2,.15);
+ box('elevator floor',[0,0,0],[1.08,.13,1.05],gold,cage);for(const x of [-.5,.5])for(const z of [-.48,.48])box('cage post',[x,.65,z],[.08,1.3,.08],metal,cage);
+ for(const y of [.18,1.1]){box('cage front bar',[0,y,.48],[1.05,.07,.07],metal,cage);box('cage back bar',[0,y,-.48],[1.05,.07,.07],metal,cage)}
+ // Conveyor from shaft mouth to processing building.
+ for(const z of [-.28,.28])beam('surface conveyor rail',[-1.35,.28,z],[1.35,.28,z],.045,metal);
+ for(let x=-1.2;x<1.3;x+=.35)box('conveyor belt slat',[x,.23,0],[.13,.08,.72],wood2);
+ // Miner silhouettes with pickaxes on the first two levels.
+ const miners=[];
+ function makeMiner(x,y,z){const root=new B.TransformNode('miner',scene);root.position.set(x,y,z);box('miner body',[0,.42,0],[.32,.52,.25],mat('uniform '+miners.length,'#276b4d'),root);sphere('miner head',[0,.82,.02],.32,wood2,root);cyl('helmet',[0,1,.02],.13,.39,gold,root);beam('pick handle',[.15,.35,.05],[.48,.82,.05],.045,wood2,root);beam('pick head',[.3,.83,-.05],[.65,.83,-.05],.06,metal,root);miners.push(root)}
+ makeMiner(.65,-2.62,.72);makeMiner(.85,-4.87,-.7);
+ // Surface signs are small labels, not additional buildings.
+ const makeText=(txt,pos)=>{const plane=B.MeshBuilder.CreatePlane('sign',{width:1.55,height:.34},scene);plane.position.set(...pos);plane.rotation.y=0;const t=new B.DynamicTexture('sign texture',{width:512,height:128},scene,false);t.hasAlpha=true;t.drawText(txt,18,84,'bold 48px Arial','#f5f0dc','transparent',true);const m=new B.StandardMaterial('sign material',scene);m.diffuseTexture=t;m.emissiveColor=new B.Color3(.8,.8,.8);m.backFaceCulling=false;plane.material=m};
+ makeText('ЛИФТ',[-2.45,2.2,1.35]);makeText('УГОЛЬ',[2.8,2.2,1.45]);
+ let money=0,coalCount=0,liftLevel=1,openFloors=2,processLevel=1,time=0;
+ const moneyEl=document.getElementById('money'),coalEl=document.getElementById('coal');
+ function update(){moneyEl.textContent=Math.floor(money);coalEl.textContent=coalCount;document.getElementById('floors').textContent=openFloors;document.getElementById('level').textContent='ШАХТА • УРОВЕНЬ '+liftLevel}
+ function toast(s){const e=document.getElementById('toast');e.textContent=s;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1700)}
+ document.getElementById('liftBtn').onclick=()=>{const cost=25*liftLevel;if(money<cost){toast('Нужно ещё '+cost+' ◆');return}money-=cost;liftLevel++;toast('Лифт улучшен: быстрее поднимает уголь');update();document.getElementById('liftBtn').textContent='УЛУЧШИТЬ ЛИФТ • '+25*liftLevel+' ◆'};
+ document.getElementById('floorBtn').onclick=()=>{const cost=60*openFloors;if(money<cost){toast('Нужно ещё '+cost+' ◆');return}money-=cost;openFloors++;toast('Открыт новый шахтный этаж');update();document.getElementById('floorBtn').textContent='ОТКРЫТЬ ЭТАЖ • '+60*openFloors+' ◆'};
+ scene.onBeforeRenderObservable.add(()=>{const dt=engine.getDeltaTime()/1000;time+=dt;cage.position.y=-1.4+Math.sin(time*(.75+liftLevel*.12))*1.05;galleryMeshes.forEach((c,i)=>{c.position.x=1.1+Math.sin(time*.55+i)*.55});miners.forEach((m,i)=>{m.rotation.z=Math.sin(time*3+i)*.07;m.position.y=(i===0?-2.62:-4.87)+Math.sin(time*3+i)*.025});if(Math.floor(time*1.25)>coalCount){coalCount=Math.floor(time*1.25);money+=Math.max(1,Math.floor((1+processLevel*.2)*liftLevel));update()}});
+ engine.runRenderLoop(()=>scene.render());window.addEventListener('resize',()=>engine.resize());
+ setTimeout(()=>document.getElementById('loading').classList.add('hide'),700);
 })();
-})();
-</script>
-</body>
-</html>
+</script></body></html>
