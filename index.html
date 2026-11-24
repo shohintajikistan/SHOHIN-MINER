@@ -28,7 +28,7 @@ button{cursor:pointer}button:active{transform:scale(.98)}.hidden{display:none!im
 <header><div class="brand"><div class="crown">♛</div><div><b>SHOHIN MINER</b><small>СТАНЬ МИЛЛИОНЕРОМ</small></div></div><div class="money"><small>ВАШ КАПИТАЛ</small><strong id="money">$ 0</strong></div></header>
 <main>
 <div class="hero"><div><h1>Моя горнодобывающая империя</h1><p>Добывай. Перерабатывай. Развивайся.</p></div><div class="level" id="level">УРОВЕНЬ 1</div></div>
-<div class="scene-wrap"><canvas class="scene" id="scene" width="900" height="725"></canvas><div class="scene-label" id="sceneLabel">ШАХТА №1 · УГОЛЬ</div><div class="scene-hint">Нажми на шахту, чтобы выбрать этаж</div></div>
+<div class="scene-wrap"><canvas class="scene" id="scene" width="900" height="725"></canvas><div class="scene-label" id="sceneLabel">ШАХТА №1 · УГОЛЬ</div><div class="scene-hint">БОКОВОЙ ВИД · МАСШТАБ ДВУМЯ ПАЛЬЦАМИ</div></div>
 <div class="stats">
 <div class="stat"><small>ДОБЫТО РУДЫ</small><b id="ore">0 кг</b></div>
 <div class="stat"><small>ДОХОД В МИНУТУ</small><b id="income">$0</b></div>
@@ -118,9 +118,9 @@ let r=new Float32Array([cy*cz,cy*szv,-syv,0,sxv*syv*cz-cx*szv,sxv*syv*szv+cx*cz,
 m=mul(r,new Float32Array([sx,0,0,0,0,sy,0,0,0,0,sz,0,x,y,z,1]));return m}
 function perspective(f,a,n,fv){let t=1/Math.tan(f/2);return new Float32Array([t/a,0,0,0,0,t,0,0,0,0,(fv+n)/(n-fv),-1,0,0,2*fv*n/(n-fv),0])}
 function look(eye,at){let z=[eye[0]-at[0],eye[1]-at[1],eye[2]-at[2]],zn=Math.hypot(...z);z=z.map(v=>v/zn);let x=[z[2],0,-z[0]],xn=Math.hypot(...x);x=x.map(v=>v/xn);let y=[z[1]*x[2]-z[2]*x[1],z[2]*x[0]-z[0]*x[2],z[0]*x[1]-z[1]*x[0]];return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-(x[0]*eye[0]+x[1]*eye[1]+x[2]*eye[2]),-(y[0]*eye[0]+y[1]*eye[1]+y[2]*eye[2]),-(z[0]*eye[0]+z[1]*eye[1]+z[2]*eye[2]),1])}
-let cameraYaw=-0.48,cameraPitch=0.12,drag=null,zoom=1;
+let cameraYaw=0,cameraPitch=0,drag=null,zoom=1;
 function cube(x,y,z,sx,sy,sz,color,rx=0,ry=0,rz=0){
-const model=tr(x,y,z,sx,sy,sz,rx,ry,rz),eye=[Math.sin(cameraYaw)*15*zoom,7+cameraPitch*12,Math.cos(cameraYaw)*15*zoom],view=look(eye,[0,-2,0]),proj=perspective(0.78,canvas.width/canvas.height,.1,100);
+const model=tr(x,y,z,sx,sy,sz,rx,ry,rz),eye=[0,0,24],view=look(eye,[0,0,0]),aspect=canvas.width/canvas.height,scale=6.6/zoom,proj=new Float32Array([1/(scale*aspect),0,0,0,0,-1/scale,0,0,0,0,-1/50,0,0,0,0,1]);
 gl.uniformMatrix4fv(uModel,false,model);gl.uniformMatrix4fv(um,false,mul(proj,mul(view,model)));gl.uniform4fv(uc,color);gl.drawArrays(gl.TRIANGLES,0,36);
 }
 function draw(){
@@ -128,7 +128,7 @@ const dpr=Math.min(devicePixelRatio||1,1.5),w=Math.max(320,canvas.clientWidth),h
 if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}
 gl.viewport(0,0,canvas.width,canvas.height);gl.enable(gl.DEPTH_TEST);gl.clearColor(.035,.09,.07,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 const rock=[.23,.20,.15,1],rock2=[.34,.28,.20,1],beam=[.39,.29,.16,1],steel=[.43,.51,.47,1],gold=[.73,.53,.25,1],dark=[.09,.14,.12,1],green=[.08,.43,.25,1],worker=[.83,.58,.24,1],helmet=[.96,.75,.25,1],crystal=[.15,.76,.59,1];
-/* ground and above-ground mine buildings */
+/* SIDE VIEW: surface buildings above the vertical mine shaft */
 cube(0,-6.3,0,16,.45,11,[.18,.25,.17,1]);
 cube(-4,-5.8,-2,3.1,1.3,2.5,[.24,.34,.22,1]);cube(-4,-4.9,-2,2.5,.65,2,[.57,.46,.28,1]);cube(-4,-4.45,-2,2.8,.18,2.2,[.28,.38,.25,1]);
 cube(3,-5.1,-2,2.3,2.6,2,[.28,.36,.31,1]);cube(3,-3.7,-2,2.5,.35,2.2,steel);cube(3,-4.7,-.95,1.35,1.2,.12,dark);
@@ -155,10 +155,11 @@ for(let k=0;k<4;k++)cube(cartX-.38+k*.25,-3.94,1.82,.18,.34,.22,crystal,0,0,.12)
 /* warm lamps along the tunnel */
 for(let floor=0;floor<5;floor++){let y=4.2-floor*1.85;cube(-4.65,y,1.8,.16,.22,.16,helmet);cube(4.65,y,1.8,.16,.22,.16,helmet)}
 }
-canvas.addEventListener("pointerdown",e=>{drag={x:e.clientX,y:e.clientY,yaw:cameraYaw,pitch:cameraPitch};canvas.setPointerCapture(e.pointerId)});
-canvas.addEventListener("pointermove",e=>{if(!drag)return;cameraYaw=drag.yaw+(e.clientX-drag.x)*.009;cameraPitch=Math.max(-.12,Math.min(.42,drag.pitch+(e.clientY-drag.y)*.006));draw()});
-canvas.addEventListener("pointerup",()=>drag=null);canvas.addEventListener("pointercancel",()=>drag=null);
 canvas.addEventListener("wheel",e=>{zoom=Math.max(.72,Math.min(1.5,zoom+e.deltaY*.001));draw()},{passive:true});
+let pinchStart=0,pinchZoom=1;
+canvas.addEventListener("touchstart",e=>{if(e.touches.length===2){pinchStart=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);pinchZoom=zoom;}},{passive:true});
+canvas.addEventListener("touchmove",e=>{if(e.touches.length===2&&pinchStart){let d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);zoom=Math.max(.72,Math.min(1.5,pinchZoom*d/pinchStart));draw();}},{passive:true});
+canvas.addEventListener("touchend",()=>{pinchStart=0;},{passive:true});
 window.addEventListener("resize",draw);
 let anim=0;
 let last=Date.now();
