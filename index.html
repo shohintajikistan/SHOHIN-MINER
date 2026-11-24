@@ -28,8 +28,8 @@ button:active{transform:scale(.97)}button.primary{background:linear-gradient(145
 <script>
 (async()=>{
  const status=document.querySelector('.loader span');
- const load=(urls)=>new Promise((resolve,reject)=>{let i=0;function next(){if(i>=urls.length)return reject(Error('3D engine unavailable'));const s=document.createElement('script');s.src=urls[i++];s.onload=resolve;s.onerror=()=>{s.remove();next()};document.head.appendChild(s)}next()});
- try{await load(['https://cdn.babylonjs.com/babylon.js','https://cdn.jsdelivr.net/npm/babylonjs@7.54.3/babylon.js'])}catch(e){status.textContent='НЕТ СОЕДИНЕНИЯ С 3D ДВИЖКОМ';return}
+ const load=(urls)=>new Promise((resolve,reject)=>{let i=0;function next(){if(i>=urls.length)return reject(Error('3D engine unavailable'));const url=urls[i++];status.textContent=i===1?'ЗАГРУЗКА 3D ДВИЖКА…':'ПРОБУЕМ РЕЗЕРВНЫЙ 3D СЕРВЕР…';const s=document.createElement('script');let done=false;const timer=setTimeout(()=>finish(false),10000);function finish(ok){if(done)return;done=true;clearTimeout(timer);if(ok)resolve();else{s.remove();next()}}s.src=url;s.onload=()=>finish(true);s.onerror=()=>finish(false);document.head.appendChild(s)}next()});
+ try{await load(['https://cdn.babylonjs.com/babylon.js','https://cdn.jsdelivr.net/npm/babylonjs@7.54.3/babylon.js'])}catch(e){status.textContent='3D ДВИЖОК НЕ ЗАГРУЗИЛСЯ. ПРОВЕРЬ ИНТЕРНЕТ И ОБНОВИ СТРАНИЦУ.';return}
  const B=BABYLON,canvas=document.getElementById('renderCanvas'),engine=new B.Engine(canvas,true,{preserveDrawingBuffer:false,stencil:true,adaptToDeviceRatio:true});
  const scene=new B.Scene(engine);scene.clearColor=new B.Color4(.48,.68,.76,1);scene.ambientColor=new B.Color3(.3,.3,.3);
  const camera=new B.ArcRotateCamera('camera',-Math.PI/3,1.12,19,new B.Vector3(0,-1.4,0),scene);camera.lowerRadiusLimit=11;camera.upperRadiusLimit=28;camera.lowerBetaLimit=.65;camera.upperBetaLimit=1.42;camera.wheelPrecision=55;camera.panningSensibility=0;camera.attachControl(canvas,true);camera.inputs.removeByType('ArcRotateCameraKeyboardMoveInput');
