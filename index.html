@@ -12,7 +12,7 @@ header{padding:15px 16px 12px;display:flex;align-items:center;justify-content:sp
 .brand{display:flex;gap:10px;align-items:center}.crown{width:40px;height:40px;border:1px solid #8b743a;border-radius:12px;display:grid;place-items:center;color:var(--gold);font-size:22px;background:#102d22}.brand b{display:block;font-size:15px;letter-spacing:1.2px}.brand small{color:var(--muted);font-size:10px;letter-spacing:1.4px}.money{text-align:right}.money small{display:block;color:var(--muted);font-size:10px}.money strong{font-size:19px;color:var(--lime);font-variant-numeric:tabular-nums}
 main{padding:12px}.hero{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 10px}.hero h1{font-size:19px;margin:0;letter-spacing:.3px}.hero p{margin:3px 0 0;color:var(--muted);font-size:11px}.level{border:1px solid #5c5530;color:var(--gold);padding:6px 9px;border-radius:9px;font-size:11px}
 .scene-wrap{position:relative;border:1px solid #28533f;border-radius:17px;overflow:hidden;background:#0a211a;box-shadow:0 12px 30px #0005}.scene{display:block;width:100%;height:auto;aspect-ratio:1.24/1;touch-action:none}.scene-label{position:absolute;top:10px;left:11px;padding:6px 9px;border-radius:8px;background:#061811cc;border:1px solid #315542;color:#c9e5d3;font-size:10px;letter-spacing:.5px}.scene-hint{position:absolute;right:10px;bottom:9px;color:#c5d9cd;background:#061811c9;padding:5px 8px;border-radius:7px;font-size:10px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.stat{background:var(--panel);border:1px solid #214936;border-radius:12px;padding:10px}.stat small{display:block;color:var(--muted);font-size:10px}.stat b{display:block;margin-top:3px;font-size:15px;color:#f5f8f4}
+.flow-panel{margin:10px 0;background:#0c2b20;border:1px solid #326047;border-radius:14px;padding:11px}.flow-title{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.5px}.flow-title span{font-size:9px;color:#baf05b}.flow-steps{display:flex;align-items:center;justify-content:space-between;gap:3px;margin:12px 0}.flow-step{flex:1;min-width:0;text-align:center;background:#123b2b;border:1px solid #28543c;border-radius:9px;padding:7px 2px}.flow-step span{display:grid;place-items:center;margin:0 auto 5px;width:19px;height:19px;border-radius:50%;background:#08a56c;color:white;font-size:10px;font-weight:800}.flow-step b{display:block;font-size:8px;white-space:nowrap}.flow-step small{display:block;color:#a8c4b3;font-size:8px;margin-top:4px;line-height:1.2}.flow-steps>i{font-style:normal;color:#baf05b;font-size:12px}.flow-details{display:flex;justify-content:space-between;gap:5px;border-top:1px solid #28513d;padding-top:9px;color:#9eb9aa;font-size:9px}.flow-details b{color:#f3f7f3;display:block;font-size:11px;margin-top:3px}@media(max-width:390px){.flow-panel{padding:8px}.flow-step{padding:6px 1px}.flow-step b{font-size:7px}.flow-step small{font-size:7px}.flow-steps>i{font-size:9px}.flow-details{font-size:8px}}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.stat{background:var(--panel);border:1px solid #214936;border-radius:12px;padding:10px}.stat small{display:block;color:var(--muted);font-size:10px}.stat b{display:block;margin-top:3px;font-size:15px;color:#f5f8f4}
 .tabs{display:flex;gap:7px;margin:12px 0 9px;overflow:auto}.tab{flex:1;min-width:0;border:1px solid #28513d;border-radius:10px;background:#0b281e;color:#bad0c2;padding:10px 6px;font-size:11px;font-weight:700}.tab.active{background:#145238;border-color:var(--green);color:white}
 .panel{background:linear-gradient(145deg,#0e3326,#0a261d);border:1px solid #28513d;border-radius:15px;padding:13px;margin-bottom:10px}.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.panel h2{font-size:14px;margin:0}.sub{font-size:10px;color:var(--muted)}
 .item{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #214333}.item:first-of-type{border-top:0}.item-icon{width:40px;height:40px;flex:none;border-radius:11px;background:#173f2d;display:grid;place-items:center;font-size:21px}.item-info{flex:1;min-width:0}.item-info b{display:block;font-size:12px}.item-info small{color:var(--muted);font-size:10px;display:block;margin-top:3px}.buy{border:1px solid #477a47;border-radius:9px;background:#174b32;color:#d8f7c0;padding:8px 10px;font-size:11px;font-weight:800;min-width:84px}.buy:disabled{opacity:.38}.bar{height:5px;background:#1b3d2d;border-radius:8px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#08a56c,#baf05b);width:0}
@@ -29,6 +29,17 @@ button{cursor:pointer}button:active{transform:scale(.98)}.hidden{display:none!im
 <main>
 <div class="hero"><div><h1>Моя горнодобывающая империя</h1><p>Добывай. Перерабатывай. Развивайся.</p></div><div class="level" id="level">УРОВЕНЬ 1</div></div>
 <div class="scene-wrap"><canvas class="scene" id="scene" width="900" height="725"></canvas><div class="scene-label" id="sceneLabel">ШАХТА №1 · УГОЛЬ</div><div class="scene-hint">БОКОВОЙ ВИД · МАСШТАБ ДВУМЯ ПАЛЬЦАМИ</div></div>
+<div class="flow-panel">
+<div class="flow-title"><b>КАК РАБОТАЕТ ШАХТА</b><span id="flowStatus">ЦИКЛ ДОБЫЧИ</span></div>
+<div class="flow-steps">
+<div class="flow-step"><span>1</span><b>ШАХТЁР</b><small>Добывает руду</small></div><i>→</i>
+<div class="flow-step"><span>2</span><b>ВАГОНЕТКА</b><small>Собирает руду</small></div><i>→</i>
+<div class="flow-step"><span>3</span><b>ЛИФТ</b><small>Поднимает наверх</small></div><i>→</i>
+<div class="flow-step"><span>4</span><b>ЗАВОД</b><small>Перерабатывает</small></div><i>→</i>
+<div class="flow-step"><span>5</span><b>ПРОДАЖА</b><small>Даёт деньги</small></div>
+</div>
+<div class="flow-details"><span>В шахте ожидает: <b id="stockInfo">0 кг</b></span><span>На заводе: <b id="oreInfo">0 кг</b></span><span>Заработано: <b id="earnedInfo">$0</b></span></div>
+</div>
 <div class="stats">
 <div class="stat"><small>ДОБЫТО РУДЫ</small><b id="ore">0 кг</b></div>
 <div class="stat"><small>ДОХОД В МИНУТУ</small><b id="income">$0</b></div>
@@ -64,7 +75,7 @@ const save=()=>{try{localStorage.setItem("shohinMinerSave",JSON.stringify(s))}ca
 const cost=(base,level)=>Math.floor(base*Math.pow(1.55,level));
 function income(){return s.miners*(1+s.pick*.25)*12*prices[s.mine]*(1+s.value*.2)}
 function update(){
-$("money").textContent=fmt(s.cash);$("ore").textContent=Math.floor(s.total).toLocaleString()+" кг";$("income").textContent=fmt(income()*60/((1+s.mine)*1.0));$("minesCount").textContent=s.unlocked+" / 12";$("level").textContent="УРОВЕНЬ "+(1+Math.floor(Math.log10(s.cash+1)));
+$("money").textContent=fmt(s.cash);$("stockInfo").textContent=Math.floor(s.stock)+" кг";$("oreInfo").textContent=Math.floor(s.ore)+" кг";$("earnedInfo").textContent=fmt(s.cash);$("ore").textContent=Math.floor(s.total).toLocaleString()+" кг";$("income").textContent=fmt(income()*60/((1+s.mine)*1.0));$("minesCount").textContent=s.unlocked+" / 12";$("level").textContent="УРОВЕНЬ "+(1+Math.floor(Math.log10(s.cash+1)));
 $("minersInfo").textContent="Добыча: "+(s.miners*(1+s.pick*.25)).toFixed(1)+" кг / 5 сек";$("liftInfo").textContent="Вместимость: "+(s.lift*5)+" кг за рейс";$("factoryInfo").textContent="Переработка: "+(s.factory*5)+" кг за 8 сек";
 $("hire").textContent="Нанять · "+fmt(cost(50,s.miners-1));$("liftUp").textContent="Улучшить · "+fmt(cost(75,s.lift-1));$("factoryUp").textContent="Улучшить · "+fmt(cost(100,s.factory-1));
 $("pickUp").textContent="Купить · "+fmt(150*Math.pow(2,s.pick));$("autoUp").textContent="Купить · "+fmt(200*Math.pow(2,s.auto));$("valueUp").textContent="Купить · "+fmt(300*Math.pow(2,s.value));
@@ -167,7 +178,7 @@ function tick(){let now=Date.now(),dt=Math.min(1,(now-last)/1000);last=now;anim+
 s.minerT+=dt;s.liftT+=dt;s.factoryT+=dt;
 let mining=5/(1+s.pick*.25);if(s.minerT>=mining){let amount=s.miners*(1+s.pick*.25);s.stock+=amount;s.total+=amount;s.minerT=0}
 if(s.liftT>=Math.max(1,7/s.lift)){let move=Math.min(s.stock,s.lift*5);s.stock-=move;s.ore+=move;s.liftT=0}
-if(s.factoryT>=Math.max(1,8/(s.factory+s.auto*.7))){let process=Math.min(s.ore,s.factory*5);s.ore-=process;s.cash+=process*prices[s.mine]*(1+s.value*.2);s.factoryT=0}
+if(s.factoryT>=Math.max(1,8/(s.factory+s.auto*.7))){let process=Math.min(s.ore,s.factory*5);s.ore-=process;s.cash+=process*prices[s.mine]*(1+s.value*.2);s.factoryT=0} $("flowStatus").textContent=s.stock>0?"РУДА ЖДЁТ ЛИФТ":s.ore>0?"ЗАВОД ПЕРЕРАБАТЫВАЕТ":"ШАХТЁРЫ ДОБЫВАЮТ";
 $("minerBar").style.width=(s.minerT/(5/(1+s.pick*.25))*100)+"%";$("liftBar").style.width=(s.liftT/Math.max(1,7/s.lift)*100)+"%";$("factoryBar").style.width=(s.factoryT/Math.max(1,8/(s.factory+s.auto*.7))*100)+"%";
 if(anim%5===0){update();save()}else draw();requestAnimationFrame(tick)}
 update();requestAnimationFrame(tick);
