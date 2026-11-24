@@ -11,7 +11,7 @@
 header{padding:15px 16px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #24513e;background:#09251c;position:sticky;top:0;z-index:5}
 .brand{display:flex;gap:10px;align-items:center}.crown{width:40px;height:40px;border:1px solid #8b743a;border-radius:12px;display:grid;place-items:center;color:var(--gold);font-size:22px;background:#102d22}.brand b{display:block;font-size:15px;letter-spacing:1.2px}.brand small{color:var(--muted);font-size:10px;letter-spacing:1.4px}.money{text-align:right}.money small{display:block;color:var(--muted);font-size:10px}.money strong{font-size:19px;color:var(--lime);font-variant-numeric:tabular-nums}
 main{padding:12px}.hero{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 10px}.hero h1{font-size:19px;margin:0;letter-spacing:.3px}.hero p{margin:3px 0 0;color:var(--muted);font-size:11px}.level{border:1px solid #5c5530;color:var(--gold);padding:6px 9px;border-radius:9px;font-size:11px}
-.scene-wrap{position:relative;border:1px solid #28533f;border-radius:17px;overflow:hidden;background:#0a211a;box-shadow:0 12px 30px #0005}.scene{display:block;width:100%;height:auto;aspect-ratio:1.24/1;touch-action:pan-y}.scene-label{position:absolute;top:10px;left:11px;padding:6px 9px;border-radius:8px;background:#061811cc;border:1px solid #315542;color:#c9e5d3;font-size:10px;letter-spacing:.5px}.scene-hint{position:absolute;right:10px;bottom:9px;color:#c5d9cd;background:#061811c9;padding:5px 8px;border-radius:7px;font-size:10px}
+.scene-wrap{position:relative;border:1px solid #28533f;border-radius:17px;overflow:hidden;background:#0a211a;box-shadow:0 12px 30px #0005}.scene{display:block;width:100%;height:auto;aspect-ratio:1.24/1;touch-action:none}.scene-label{position:absolute;top:10px;left:11px;padding:6px 9px;border-radius:8px;background:#061811cc;border:1px solid #315542;color:#c9e5d3;font-size:10px;letter-spacing:.5px}.scene-hint{position:absolute;right:10px;bottom:9px;color:#c5d9cd;background:#061811c9;padding:5px 8px;border-radius:7px;font-size:10px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.stat{background:var(--panel);border:1px solid #214936;border-radius:12px;padding:10px}.stat small{display:block;color:var(--muted);font-size:10px}.stat b{display:block;margin-top:3px;font-size:15px;color:#f5f8f4}
 .tabs{display:flex;gap:7px;margin:12px 0 9px;overflow:auto}.tab{flex:1;min-width:0;border:1px solid #28513d;border-radius:10px;background:#0b281e;color:#bad0c2;padding:10px 6px;font-size:11px;font-weight:700}.tab.active{background:#145238;border-color:var(--green);color:white}
 .panel{background:linear-gradient(145deg,#0e3326,#0a261d);border:1px solid #28513d;border-radius:15px;padding:13px;margin-bottom:10px}.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.panel h2{font-size:14px;margin:0}.sub{font-size:10px;color:var(--muted)}
@@ -85,33 +85,82 @@ $("mineList").innerHTML=mineNames.map((n,i)=>{let open=i<s.unlocked;return '<div
 $("mineList").querySelectorAll("[data-mine]").forEach(b=>b.onclick=()=>{let i=+b.dataset.mine;if(i<s.unlocked){s.mine=i;save();update()}else if(s.cash>=costs[i]){s.cash-=costs[i];s.unlocked=i+1;s.mine=i;save();update()}});
 }
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));["business","mines","upgrades"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab))});
-const canvas=$("scene"),ctx=canvas.getContext("2d");let anim=0;
-function poly(points,fill,stroke="#0005"){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}}
-function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}
+const canvas=$("scene");
+const gl=canvas.getContext("webgl",{antialias:true,alpha:false});
+if(!gl){$("sceneLabel").textContent="WEBGL НЕ ПОДДЕРЖИВАЕТСЯ";throw new Error("WebGL unavailable");}
+const vs=gl.createShader(gl.VERTEX_SHADER);
+gl.shaderSource(vs,"attribute vec3 p; attribute vec3 n; uniform mat4 mvp; uniform mat4 model; varying float light; void main(){vec3 nn=normalize(mat3(model)*n); light=0.38+0.62*max(dot(nn,normalize(vec3(-0.4,0.8,0.5))),0.0); gl_Position=mvp*vec4(p,1.0);}");
+gl.compileShader(vs);
+const fs=gl.createShader(gl.FRAGMENT_SHADER);
+gl.shaderSource(fs,"precision mediump float; uniform vec4 color; varying float light; void main(){gl_FragColor=vec4(color.rgb*light,color.a);}");
+gl.compileShader(fs);
+const program=gl.createProgram();gl.attachShader(program,vs);gl.attachShader(program,fs);gl.linkProgram(program);
+if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw new Error("WebGL shader error");
+gl.useProgram(program);
+const verts=[
+-0.5,-0.5,0.5,0,0,1, .5,-.5,.5,0,0,1, .5,.5,.5,0,0,1, -.5,-.5,.5,0,0,1, .5,.5,.5,0,0,1, -.5,.5,.5,0,0,1,
+.5,-.5,-.5,0,0,-1, -.5,-.5,-.5,0,0,-1, -.5,.5,-.5,0,0,-1, .5,-.5,-.5,0,0,-1, -.5,.5,-.5,0,0,-1, .5,.5,-.5,0,0,-1,
+-.5,.5,.5,0,1,0, .5,.5,.5,0,1,0, .5,.5,-.5,0,1,0, -.5,.5,.5,0,1,0, .5,.5,-.5,0,1,0, -.5,.5,-.5,0,1,0,
+-.5,-.5,-.5,0,-1,0, .5,-.5,-.5,0,-1,0, .5,-.5,.5,0,-1,0, -.5,-.5,-.5,0,-1,0, .5,-.5,.5,0,-1,0, -.5,-.5,.5,0,-1,0,
+.5,-.5,.5,1,0,0, .5,-.5,-.5,1,0,0, .5,.5,-.5,1,0,0, .5,-.5,.5,1,0,0, .5,.5,-.5,1,0,0, .5,.5,.5,1,0,0,
+-.5,-.5,-.5,-1,0,0, -.5,-.5,.5,-1,0,0, -.5,.5,.5,-1,0,0, -.5,-.5,-.5,-1,0,0, -.5,.5,.5,-1,0,0, -.5,.5,-.5,-1,0,0
+];
+const vb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,vb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(verts),gl.STATIC_DRAW);
+const stride=24,ap=gl.getAttribLocation(program,"p"),an=gl.getAttribLocation(program,"n");
+gl.enableVertexAttribArray(ap);gl.vertexAttribPointer(ap,3,gl.FLOAT,false,stride,0);
+gl.enableVertexAttribArray(an);gl.vertexAttribPointer(an,3,gl.FLOAT,false,stride,12);
+const um=gl.getUniformLocation(program,"mvp"),uModel=gl.getUniformLocation(program,"model"),uc=gl.getUniformLocation(program,"color");
+const I=()=>new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
+function mul(a,b){let o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++)o[c*4+r]=a[r]*b[c*4]+a[4+r]*b[c*4+1]+a[8+r]*b[c*4+2]+a[12+r]*b[c*4+3];return o}
+function tr(x,y,z,sx,sy,sz,rx=0,ry=0,rz=0){
+let m=I(),cx=Math.cos(rx),sxv=Math.sin(rx),cy=Math.cos(ry),syv=Math.sin(ry),cz=Math.cos(rz),szv=Math.sin(rz);
+let r=new Float32Array([cy*cz,cy*szv,-syv,0,sxv*syv*cz-cx*szv,sxv*syv*szv+cx*cz,sxv*cy,0,cx*syv*cz+sxv*szv,cx*syv*szv-sxv*cz,cx*cy,0,0,0,0,1]);
+m=mul(r,new Float32Array([sx,0,0,0,0,sy,0,0,0,0,sz,0,x,y,z,1]));return m}
+function perspective(f,a,n,fv){let t=1/Math.tan(f/2);return new Float32Array([t/a,0,0,0,0,t,0,0,0,0,(fv+n)/(n-fv),-1,0,0,2*fv*n/(n-fv),0])}
+function look(eye,at){let z=[eye[0]-at[0],eye[1]-at[1],eye[2]-at[2]],zn=Math.hypot(...z);z=z.map(v=>v/zn);let x=[z[2],0,-z[0]],xn=Math.hypot(...x);x=x.map(v=>v/xn);let y=[z[1]*x[2]-z[2]*x[1],z[2]*x[0]-z[0]*x[2],z[0]*x[1]-z[1]*x[0]];return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-(x[0]*eye[0]+x[1]*eye[1]+x[2]*eye[2]),-(y[0]*eye[0]+y[1]*eye[1]+y[2]*eye[2]),-(z[0]*eye[0]+z[1]*eye[1]+z[2]*eye[2]),1])}
+let cameraYaw=-0.48,cameraPitch=0.12,drag=null,zoom=1;
+function cube(x,y,z,sx,sy,sz,color,rx=0,ry=0,rz=0){
+const model=tr(x,y,z,sx,sy,sz,rx,ry,rz),eye=[Math.sin(cameraYaw)*15*zoom,7+cameraPitch*12,Math.cos(cameraYaw)*15*zoom],view=look(eye,[0,-2,0]),proj=perspective(0.78,canvas.width/canvas.height,.1,100);
+gl.uniformMatrix4fv(uModel,false,model);gl.uniformMatrix4fv(um,false,mul(proj,mul(view,model)));gl.uniform4fv(uc,color);gl.drawArrays(gl.TRIANGLES,0,36);
+}
 function draw(){
-const w=900,h=725;ctx.clearRect(0,0,w,h);
-let sky=ctx.createLinearGradient(0,0,0,250);sky.addColorStop(0,"#173d32");sky.addColorStop(1,"#345b43");rect(0,0,w,250,sky);
-for(let i=0;i<18;i++){let x=(i*83+22)%900,y=30+(i*37)%160;ctx.fillStyle="#b9d98b22";ctx.beginPath();ctx.arc(x,y,2+(i%3),0,7);ctx.fill()}
-poly([[0,200],[900,200],[900,725],[0,725]],"#362c22");
-poly([[0,198],[900,198],[900,248],[0,248]],"#6b5938");
-for(let y=270;y<725;y+=82){rect(0,y,900,3,"#574331");for(let x=15;x<900;x+=75){poly([[x,y],[x+35,y-18],[x+68,y],[x+35,y+18]],"#51402d","#71593d")}}
-/* surface facilities */
-poly([[55,130],[195,130],[220,200],[30,200]],"#1c3b2b");rect(75,80,115,55,"#b9a16a");poly([[60,80],[132,40],[205,80]],"#5b6844");rect(100,94,28,41,"#293d30");rect(148,95,27,25,"#294b3a");
-ctx.fillStyle="#d5c28b";ctx.font="bold 15px system-ui";ctx.fillText("ПЕРЕРАБОТКА",55,222);
-rect(340,35,112,165,"#394b43");rect(352,48,88,142,"#182a25");rect(370,65,52,120,"#8b9a8d");rect(378,72,36,105,"#263e35");rect(330,25,132,17,"#a9b59d");rect(375,12,42,13,"#d0d4bb");ctx.fillStyle="#d7e7ce";ctx.font="bold 15px system-ui";ctx.fillText("ЛИФТ",366,218);
-for(let y=240;y<700;y+=82){rect(340,y,112,5,"#b3a37a");rect(335,y+6,6,72,"#917e58");rect(451,y+6,6,72,"#917e58");}
-let liftY=255+(Math.sin(anim/35)*.5+.5)*390;rect(359,liftY,74,42,"#c49a4d");rect(365,liftY+5,62,29,"#6e5737");for(let j=0;j<3;j++){rect(370+j*20,liftY+8,3,23,"#d7bd7e")}
-for(let floor=0;floor<5;floor++){let y=265+floor*82;let active=floor===s.selected;rect(30,y,280,4,active?"#baf05b":"#8a7656");rect(30,y+4,8,66,"#715c42");rect(302,y+4,8,66,"#715c42");for(let k=0;k<3;k++){let x=70+k*75;ctx.fillStyle=active?"#d9b45d":"#a27a45";ctx.beginPath();ctx.arc(x,y+35,9,0,7);ctx.fill();ctx.fillStyle="#463526";ctx.fillRect(x-3,y+43,6,15);ctx.strokeStyle="#d8d1ae";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x-8,y+27);ctx.lineTo(x+10,y+16+Math.sin(anim/6+k)*3);ctx.stroke();ctx.fillStyle="#f6d779";ctx.beginPath();ctx.arc(x+17,y+18,3,0,7);ctx.fill()} 
-for(let k=0;k<4;k++){ctx.fillStyle=["#3e9d69","#bb8d42","#779eaa","#a6c66a"][s.mine%4];ctx.beginPath();ctx.moveTo(205+k*21,y+53);ctx.lineTo(214+k*21,y+34);ctx.lineTo(225+k*21,y+53);ctx.lineTo(215+k*21,y+65);ctx.closePath();ctx.fill()}
-ctx.fillStyle=active?"#d6f3a5":"#d0c0a0";ctx.font="bold 13px system-ui";ctx.fillText("ЭТАЖ "+(floor+1),48,y-9);
+const dpr=Math.min(devicePixelRatio||1,1.5),w=Math.max(320,canvas.clientWidth),h=Math.max(260,canvas.clientHeight);
+if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}
+gl.viewport(0,0,canvas.width,canvas.height);gl.enable(gl.DEPTH_TEST);gl.clearColor(.035,.09,.07,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+const rock=[.23,.20,.15,1],rock2=[.34,.28,.20,1],beam=[.39,.29,.16,1],steel=[.43,.51,.47,1],gold=[.73,.53,.25,1],dark=[.09,.14,.12,1],green=[.08,.43,.25,1],worker=[.83,.58,.24,1],helmet=[.96,.75,.25,1],crystal=[.15,.76,.59,1];
+/* ground and above-ground mine buildings */
+cube(0,-6.3,0,16,.45,11,[.18,.25,.17,1]);
+cube(-4,-5.8,-2,3.1,1.3,2.5,[.24,.34,.22,1]);cube(-4,-4.9,-2,2.5,.65,2,[.57,.46,.28,1]);cube(-4,-4.45,-2,2.8,.18,2.2,[.28,.38,.25,1]);
+cube(3,-5.1,-2,2.3,2.6,2,[.28,.36,.31,1]);cube(3,-3.7,-2,2.5,.35,2.2,steel);cube(3,-4.7,-.95,1.35,1.2,.12,dark);
+cube(0,-4.5,-2,1.05,3.2,1.1,steel);cube(0,-2.8,-2,1.3,.22,1.35,gold);cube(0,-1.1,-2,.14,3.2,.14,gold);cube(0,-2.8,-2,.7,.12,.7,dark);
+/* deep shaft: open front, side rock walls, platforms and support beams */
+cube(-5.1,0,0,2.1,12,5.5,rock);cube(5.1,0,0,2.1,12,5.5,rock2);cube(0,5.6,0,8.4,1,5.5,rock2);cube(0,-5.8,0,8.4,.65,5.5,rock);
+for(let floor=0;floor<6;floor++){let y=4.4-floor*1.85;cube(0,y,0,8.2,.16,5.4,rock2);cube(-3.9,y+.2,0,.22,.5,5.2,beam);cube(3.9,y+.2,0,.22,.5,5.2,beam);cube(0,y+.22,-2.5,8,.22,.2,beam);cube(0,y+.22,2.5,8,.22,.2,beam);
+for(let k=0;k<3;k++){let x=-2.8+k*1.1;cube(x,y-.28,1.1,.23,.45,.22,crystal,0,0,.15);cube(x+.17,y-.25,1.1,.22,.35,.22,[.1,.5,.72,1],0,0,-.2)}
 }
-rect(475,260,3,410,"#b7a16d");rect(487,260,3,410,"#b7a16d");for(let y=270;y<680;y+=26)rect(475,y,15,3,"#c9b37c");
-poly([[520,610],[700,610],[730,655],[500,655]],"#745c3c");rect(535,590,145,30,"#9a7846");for(let i=0;i<5;i++){ctx.fillStyle="#514331";ctx.beginPath();ctx.arc(550+i*27,620,10,0,7);ctx.fill();ctx.fillStyle="#c6a15c";ctx.beginPath();ctx.arc(550+i*27,615,7,0,7);ctx.fill()}
-ctx.fillStyle="#d9e5d5";ctx.font="bold 14px system-ui";ctx.fillText("ПОДЗЕМНАЯ ШАХТА",520,690);
-ctx.fillStyle="#baf05b";ctx.font="bold 17px system-ui";ctx.fillText("+"+Math.floor(s.stock)+" кг",735,300);
-ctx.fillStyle="#e2c37a";ctx.font="bold 15px system-ui";ctx.fillText("ШАХТА "+(s.mine+1),730,335);
+/* elevator rails and moving cage */
+cube(-.65,0,-.9,.13,12,.13,gold);cube(.65,0,-.9,.13,12,.13,gold);for(let y=-5;y<5;y+=.65)cube(0,y,-.9,1.35,.06,.12,steel);
+let liftY=2.8-(anim%260)/260*9.2;cube(0,liftY,-.9,1.25,.18,1.15,gold);cube(0,liftY+.42,-.9,1.1,.12,1,dark);cube(-.52,liftY+.15,-.9,.07,.65,.07,steel);cube(.52,liftY+.15,-.9,.07,.65,.07,steel);
+/* workers: torso, head, helmet, animated pickaxe arms and legs */
+for(let floor=0;floor<5;floor++){let y=3.95-floor*1.85;for(let k=0;k<2;k++){let x=-2.4+k*1.7,phase=anim*.09+floor*1.7+k,arm=Math.sin(phase)*.55;
+cube(x,y-.55,1.55,.34,.62,.28,worker);cube(x,y-.08,1.55,.3,.3,.3,[.66,.43,.28,1]);cube(x,y+.1,1.55,.38,.12,.36,helmet);
+cube(x-.13,y-.98,1.55,.12,.38,.13,dark,0,0,-.12);cube(x+.13,y-.98,1.55,.12,.38,.13,dark,0,0,.12);
+cube(x+.28,y-.35,1.55,.12,.48,.12,worker,0,0,arm);cube(x+.53,y-.15,1.55,.08,.55,.08,steel,0,0,arm-.55);cube(x+.76,y+.02,1.55,.42,.07,.08,steel,0,0,.3);
+}}
+/* rails in the lower tunnel and animated ore cart */
+cube(1.4,-4.85,1.5,5,.08,.12,steel);cube(1.4,-4.85,2.15,5,.08,.12,steel);
+let cartX=-.8+(Math.sin(anim*.025)+1)*1.6;cube(cartX,-4.45,1.82,1.35,.48,.85,[.25,.31,.28,1]);cube(cartX,-4.12,1.82,1.15,.16,.7,gold);
+for(let x of [cartX-.45,cartX+.45])for(let z of [1.38,2.26])cube(x,-4.72,z,.22,.22,.15,dark);
+for(let k=0;k<4;k++)cube(cartX-.38+k*.25,-3.94,1.82,.18,.34,.22,crystal,0,0,.12);
+/* warm lamps along the tunnel */
+for(let floor=0;floor<5;floor++){let y=4.2-floor*1.85;cube(-4.65,y,1.8,.16,.22,.16,helmet);cube(4.65,y,1.8,.16,.22,.16,helmet)}
 }
-canvas.addEventListener("click",e=>{let r=canvas.getBoundingClientRect(),y=(e.clientY-r.top)/r.height*725;if(y>250){s.selected=Math.max(0,Math.min(4,Math.floor((y-265)/82)));draw()}});
+canvas.addEventListener("pointerdown",e=>{drag={x:e.clientX,y:e.clientY,yaw:cameraYaw,pitch:cameraPitch};canvas.setPointerCapture(e.pointerId)});
+canvas.addEventListener("pointermove",e=>{if(!drag)return;cameraYaw=drag.yaw+(e.clientX-drag.x)*.009;cameraPitch=Math.max(-.12,Math.min(.42,drag.pitch+(e.clientY-drag.y)*.006));draw()});
+canvas.addEventListener("pointerup",()=>drag=null);canvas.addEventListener("pointercancel",()=>drag=null);
+canvas.addEventListener("wheel",e=>{zoom=Math.max(.72,Math.min(1.5,zoom+e.deltaY*.001));draw()},{passive:true});
+window.addEventListener("resize",draw);
+let anim=0;
 let last=Date.now();
 function tick(){let now=Date.now(),dt=Math.min(1,(now-last)/1000);last=now;anim++;
 s.minerT+=dt;s.liftT+=dt;s.factoryT+=dt;
