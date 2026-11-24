@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#071c16">
+<title>СТАНЬ МИЛЛИОНЕРОМ — SHOHIN MINER</title>
+<style>
+:root{--bg:#071c16;--panel:#0d3024;--panel2:#124332;--green:#08a56c;--lime:#baf05b;--gold:#f3c969;--text:#f3f7f3;--muted:#9eb9aa}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}body{padding:0 0 22px}.app{max-width:760px;margin:auto;min-height:100vh;background:linear-gradient(180deg,#09251c,#061810)}
+header{padding:15px 16px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #24513e;background:#09251c;position:sticky;top:0;z-index:5}
+.brand{display:flex;gap:10px;align-items:center}.crown{width:40px;height:40px;border:1px solid #8b743a;border-radius:12px;display:grid;place-items:center;color:var(--gold);font-size:22px;background:#102d22}.brand b{display:block;font-size:15px;letter-spacing:1.2px}.brand small{color:var(--muted);font-size:10px;letter-spacing:1.4px}.money{text-align:right}.money small{display:block;color:var(--muted);font-size:10px}.money strong{font-size:19px;color:var(--lime);font-variant-numeric:tabular-nums}
+main{padding:12px}.hero{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 10px}.hero h1{font-size:19px;margin:0;letter-spacing:.3px}.hero p{margin:3px 0 0;color:var(--muted);font-size:11px}.level{border:1px solid #5c5530;color:var(--gold);padding:6px 9px;border-radius:9px;font-size:11px}
+.scene-wrap{position:relative;border:1px solid #28533f;border-radius:17px;overflow:hidden;background:#0a211a;box-shadow:0 12px 30px #0005}.scene{display:block;width:100%;height:auto;aspect-ratio:1.24/1;touch-action:pan-y}.scene-label{position:absolute;top:10px;left:11px;padding:6px 9px;border-radius:8px;background:#061811cc;border:1px solid #315542;color:#c9e5d3;font-size:10px;letter-spacing:.5px}.scene-hint{position:absolute;right:10px;bottom:9px;color:#c5d9cd;background:#061811c9;padding:5px 8px;border-radius:7px;font-size:10px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.stat{background:var(--panel);border:1px solid #214936;border-radius:12px;padding:10px}.stat small{display:block;color:var(--muted);font-size:10px}.stat b{display:block;margin-top:3px;font-size:15px;color:#f5f8f4}
+.tabs{display:flex;gap:7px;margin:12px 0 9px;overflow:auto}.tab{flex:1;min-width:0;border:1px solid #28513d;border-radius:10px;background:#0b281e;color:#bad0c2;padding:10px 6px;font-size:11px;font-weight:700}.tab.active{background:#145238;border-color:var(--green);color:white}
+.panel{background:linear-gradient(145deg,#0e3326,#0a261d);border:1px solid #28513d;border-radius:15px;padding:13px;margin-bottom:10px}.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.panel h2{font-size:14px;margin:0}.sub{font-size:10px;color:var(--muted)}
+.item{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #214333}.item:first-of-type{border-top:0}.item-icon{width:40px;height:40px;flex:none;border-radius:11px;background:#173f2d;display:grid;place-items:center;font-size:21px}.item-info{flex:1;min-width:0}.item-info b{display:block;font-size:12px}.item-info small{color:var(--muted);font-size:10px;display:block;margin-top:3px}.buy{border:1px solid #477a47;border-radius:9px;background:#174b32;color:#d8f7c0;padding:8px 10px;font-size:11px;font-weight:800;min-width:84px}.buy:disabled{opacity:.38}.bar{height:5px;background:#1b3d2d;border-radius:8px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#08a56c,#baf05b);width:0}
+.mine-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid #214333}.mine-row:first-of-type{border-top:0}.mine-left{display:flex;gap:10px;align-items:center}.mine-left b{font-size:12px}.mine-left small{display:block;color:var(--muted);font-size:10px;margin-top:3px}.mine-level{font-size:10px;color:var(--gold)}
+.notice{padding:10px 12px;border:1px solid #6b5b2d;background:#332b16;border-radius:11px;color:#f4d98b;font-size:11px;margin-bottom:10px}
+footer{text-align:center;color:#668777;font-size:10px;padding:8px 0 20px;letter-spacing:1px}
+button{cursor:pointer}button:active{transform:scale(.98)}.hidden{display:none!important}
+@media(min-width:600px){main{padding:18px}.scene{aspect-ratio:1.55/1}.stats{gap:12px}.stat{padding:13px}.stat b{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="brand"><div class="crown">♛</div><div><b>SHOHIN MINER</b><small>СТАНЬ МИЛЛИОНЕРОМ</small></div></div><div class="money"><small>ВАШ КАПИТАЛ</small><strong id="money">$ 0</strong></div></header>
+<main>
+<div class="hero"><div><h1>Моя горнодобывающая империя</h1><p>Добывай. Перерабатывай. Развивайся.</p></div><div class="level" id="level">УРОВЕНЬ 1</div></div>
+<div class="scene-wrap"><canvas class="scene" id="scene" width="900" height="725"></canvas><div class="scene-label" id="sceneLabel">ШАХТА №1 · УГОЛЬ</div><div class="scene-hint">Нажми на шахту, чтобы выбрать этаж</div></div>
+<div class="stats">
+<div class="stat"><small>ДОБЫТО РУДЫ</small><b id="ore">0 кг</b></div>
+<div class="stat"><small>ДОХОД В МИНУТУ</small><b id="income">$0</b></div>
+<div class="stat"><small>ОТКРЫТО ШАХТ</small><b id="minesCount">1 / 12</b></div>
+</div>
+<div class="tabs"><button class="tab active" data-tab="business">ПРЕДПРИЯТИЕ</button><button class="tab" data-tab="mines">ШАХТЫ</button><button class="tab" data-tab="upgrades">УЛУЧШЕНИЯ</button></div>
+<section id="business" class="panel">
+<div class="panel-head"><h2>Производственная цепочка</h2><span class="sub">АВТОМАТИЧЕСКИЙ ДОХОД</span></div>
+<div class="item"><div class="item-icon">⛏️</div><div class="item-info"><b>Шахтёры</b><small id="minersInfo">Добыча: 1 кг / 5 сек</small><div class="bar"><i id="minerBar"></i></div></div><button class="buy" id="hire">Нанять · $50</button></div>
+<div class="item"><div class="item-icon">🛗</div><div class="item-info"><b>Подъёмный лифт</b><small id="liftInfo">Вместимость: 5 кг за рейс</small><div class="bar"><i id="liftBar"></i></div></div><button class="buy" id="liftUp">Улучшить · $75</button></div>
+<div class="item"><div class="item-icon">🏭</div><div class="item-info"><b>Завод переработки</b><small id="factoryInfo">Переработка: 5 кг за 8 сек</small><div class="bar"><i id="factoryBar"></i></div></div><button class="buy" id="factoryUp">Улучшить · $100</button></div>
+</section>
+<section id="mines" class="panel hidden"><div class="panel-head"><h2>Подземные шахты</h2><span class="sub">12 МЕСТОРОЖДЕНИЙ</span></div><div id="mineList"></div></section>
+<section id="upgrades" class="panel hidden"><div class="panel-head"><h2>Развитие империи</h2><span class="sub">ПОСТОЯННЫЕ БОНУСЫ</span></div>
+<div class="item"><div class="item-icon">🧰</div><div class="item-info"><b>Улучшить кирки</b><small>Шахтёры добывают на 25% быстрее</small></div><button class="buy" id="pickUp">Купить · $150</button></div>
+<div class="item"><div class="item-icon">⚙️</div><div class="item-info"><b>Автоматизация завода</b><small>Увеличивает скорость переработки</small></div><button class="buy" id="autoUp">Купить · $200</button></div>
+<div class="item"><div class="item-icon">💎</div><div class="item-info"><b>Премиальная руда</b><small>Увеличивает стоимость всей добычи на 20%</small></div><button class="buy" id="valueUp">Купить · $300</button></div>
+</section>
+<div class="notice" id="goal">Цель: накопить первый капитал в $1 000 и открыть вторую шахту.</div>
+</main><footer>SHOHIN TAJIKISTAN · MINING EMPIRE</footer>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const mineNames=["Угольная шахта","Медный рудник","Железный рудник","Серебряный рудник","Золотой рудник","Алмазная шахта","Рубиновый рудник","Изумрудный рудник","Урановый рудник","Платиновый рудник","Мифриловая шахта","Космический рудник"];
+const ores=["Уголь","Медь","Железо","Серебро","Золото","Алмаз","Рубин","Изумруд","Уран","Платина","Мифрил","Кристалл"];
+const prices=[2,5,9,18,35,75,130,220,380,650,1100,2000];
+const costs=[0,600,2500,9000,25000,80000,220000,600000,1500000,4000000,12000000,35000000];
+let s={cash:250,ore:0,stock:0,total:0,mine:0,unlocked:1,miners:1,lift:1,factory:1,pick:0,auto:0,value:0,selected:0,minerT:0,liftT:0,factoryT:0,shaft:0};
+try{const old=JSON.parse(localStorage.getItem("shohinMinerSave"));if(old)s={...s,...old}}catch(e){}
+const fmt=n=>n>=1e9?"$"+(n/1e9).toFixed(2)+"B":n>=1e6?"$"+(n/1e6).toFixed(2)+"M":n>=1e3?"$"+(n/1e3).toFixed(1)+"K":"$"+Math.floor(n).toLocaleString("en-US");
+const save=()=>{try{localStorage.setItem("shohinMinerSave",JSON.stringify(s))}catch(e){}};
+const cost=(base,level)=>Math.floor(base*Math.pow(1.55,level));
+function income(){return s.miners*(1+s.pick*.25)*12*prices[s.mine]*(1+s.value*.2)}
+function update(){
+$("money").textContent=fmt(s.cash);$("ore").textContent=Math.floor(s.total).toLocaleString()+" кг";$("income").textContent=fmt(income()*60/((1+s.mine)*1.0));$("minesCount").textContent=s.unlocked+" / 12";$("level").textContent="УРОВЕНЬ "+(1+Math.floor(Math.log10(s.cash+1)));
+$("minersInfo").textContent="Добыча: "+(s.miners*(1+s.pick*.25)).toFixed(1)+" кг / 5 сек";$("liftInfo").textContent="Вместимость: "+(s.lift*5)+" кг за рейс";$("factoryInfo").textContent="Переработка: "+(s.factory*5)+" кг за 8 сек";
+$("hire").textContent="Нанять · "+fmt(cost(50,s.miners-1));$("liftUp").textContent="Улучшить · "+fmt(cost(75,s.lift-1));$("factoryUp").textContent="Улучшить · "+fmt(cost(100,s.factory-1));
+$("pickUp").textContent="Купить · "+fmt(150*Math.pow(2,s.pick));$("autoUp").textContent="Купить · "+fmt(200*Math.pow(2,s.auto));$("valueUp").textContent="Купить · "+fmt(300*Math.pow(2,s.value));
+["hire","liftUp","factoryUp"].forEach((id,i)=>$(id).disabled=s.cash<[cost(50,s.miners-1),cost(75,s.lift-1),cost(100,s.factory-1)][i]);
+$("pickUp").disabled=s.cash<150*Math.pow(2,s.pick);$("autoUp").disabled=s.cash<200*Math.pow(2,s.auto);$("valueUp").disabled=s.cash<300*Math.pow(2,s.value);
+$("goal").textContent=s.unlocked<12?"Следующая цель: открыть "+mineNames[s.unlocked]+" за "+fmt(costs[s.unlocked])+".":"Все месторождения открыты. Продолжай развивать империю!";
+renderMines();draw();
+}
+function buy(price,fn){if(s.cash<price)return;s.cash-=price;fn();save();update()}
+$("hire").onclick=()=>buy(cost(50,s.miners-1),()=>s.miners++);
+$("liftUp").onclick=()=>buy(cost(75,s.lift-1),()=>s.lift++);
+$("factoryUp").onclick=()=>buy(cost(100,s.factory-1),()=>s.factory++);
+$("pickUp").onclick=()=>buy(150*Math.pow(2,s.pick),()=>s.pick++);
+$("autoUp").onclick=()=>buy(200*Math.pow(2,s.auto),()=>s.auto++);
+$("valueUp").onclick=()=>buy(300*Math.pow(2,s.value),()=>s.value++);
+function renderMines(){
+$("mineList").innerHTML=mineNames.map((n,i)=>{let open=i<s.unlocked;return '<div class="mine-row"><div class="mine-left"><div class="item-icon">'+(open?"⛏️":"🔒")+'</div><div><b>'+n+'</b><small>'+(open?ores[i]+" · цена "+fmt(prices[i])+" / кг":"Открытие: "+fmt(costs[i]))+'</small></div></div><div><div class="mine-level">'+(open?(s.mine===i?"ВЫБРАНА":"ДОСТУПНА"):"ЗАКРЫТА")+'</div><button class="buy" data-mine="'+i+'" '+(open?"":(s.cash>=costs[i]?"":"disabled"))+'>'+(open?(s.mine===i?"Выбрана":"Выбрать"):"Открыть")+'</button></div></div>'}).join("");
+$("mineList").querySelectorAll("[data-mine]").forEach(b=>b.onclick=()=>{let i=+b.dataset.mine;if(i<s.unlocked){s.mine=i;save();update()}else if(s.cash>=costs[i]){s.cash-=costs[i];s.unlocked=i+1;s.mine=i;save();update()}});
+}
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));["business","mines","upgrades"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab))});
+const canvas=$("scene"),ctx=canvas.getContext("2d");let anim=0;
+function poly(points,fill,stroke="#0005"){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}}
+function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}
+function draw(){
+const w=900,h=725;ctx.clearRect(0,0,w,h);
+let sky=ctx.createLinearGradient(0,0,0,250);sky.addColorStop(0,"#173d32");sky.addColorStop(1,"#345b43");rect(0,0,w,250,sky);
+for(let i=0;i<18;i++){let x=(i*83+22)%900,y=30+(i*37)%160;ctx.fillStyle="#b9d98b22";ctx.beginPath();ctx.arc(x,y,2+(i%3),0,7);ctx.fill()}
+poly([[0,200],[900,200],[900,725],[0,725]],"#362c22");
+poly([[0,198],[900,198],[900,248],[0,248]],"#6b5938");
+for(let y=270;y<725;y+=82){rect(0,y,900,3,"#574331");for(let x=15;x<900;x+=75){poly([[x,y],[x+35,y-18],[x+68,y],[x+35,y+18]],"#51402d","#71593d")}}
+/* surface facilities */
+poly([[55,130],[195,130],[220,200],[30,200]],"#1c3b2b");rect(75,80,115,55,"#b9a16a");poly([[60,80],[132,40],[205,80]],"#5b6844");rect(100,94,28,41,"#293d30");rect(148,95,27,25,"#294b3a");
+ctx.fillStyle="#d5c28b";ctx.font="bold 15px system-ui";ctx.fillText("ПЕРЕРАБОТКА",55,222);
+rect(340,35,112,165,"#394b43");rect(352,48,88,142,"#182a25");rect(370,65,52,120,"#8b9a8d");rect(378,72,36,105,"#263e35");rect(330,25,132,17,"#a9b59d");rect(375,12,42,13,"#d0d4bb");ctx.fillStyle="#d7e7ce";ctx.font="bold 15px system-ui";ctx.fillText("ЛИФТ",366,218);
+for(let y=240;y<700;y+=82){rect(340,y,112,5,"#b3a37a");rect(335,y+6,6,72,"#917e58");rect(451,y+6,6,72,"#917e58");}
+let liftY=255+(Math.sin(anim/35)*.5+.5)*390;rect(359,liftY,74,42,"#c49a4d");rect(365,liftY+5,62,29,"#6e5737");for(let j=0;j<3;j++){rect(370+j*20,liftY+8,3,23,"#d7bd7e")}
+for(let floor=0;floor<5;floor++){let y=265+floor*82;let active=floor===s.selected;rect(30,y,280,4,active?"#baf05b":"#8a7656");rect(30,y+4,8,66,"#715c42");rect(302,y+4,8,66,"#715c42");for(let k=0;k<3;k++){let x=70+k*75;ctx.fillStyle=active?"#d9b45d":"#a27a45";ctx.beginPath();ctx.arc(x,y+35,9,0,7);ctx.fill();ctx.fillStyle="#463526";ctx.fillRect(x-3,y+43,6,15);ctx.strokeStyle="#d8d1ae";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x-8,y+27);ctx.lineTo(x+10,y+16+Math.sin(anim/6+k)*3);ctx.stroke();ctx.fillStyle="#f6d779";ctx.beginPath();ctx.arc(x+17,y+18,3,0,7);ctx.fill()} 
+for(let k=0;k<4;k++){ctx.fillStyle=["#3e9d69","#bb8d42","#779eaa","#a6c66a"][s.mine%4];ctx.beginPath();ctx.moveTo(205+k*21,y+53);ctx.lineTo(214+k*21,y+34);ctx.lineTo(225+k*21,y+53);ctx.lineTo(215+k*21,y+65);ctx.closePath();ctx.fill()}
+ctx.fillStyle=active?"#d6f3a5":"#d0c0a0";ctx.font="bold 13px system-ui";ctx.fillText("ЭТАЖ "+(floor+1),48,y-9);
+}
+rect(475,260,3,410,"#b7a16d");rect(487,260,3,410,"#b7a16d");for(let y=270;y<680;y+=26)rect(475,y,15,3,"#c9b37c");
+poly([[520,610],[700,610],[730,655],[500,655]],"#745c3c");rect(535,590,145,30,"#9a7846");for(let i=0;i<5;i++){ctx.fillStyle="#514331";ctx.beginPath();ctx.arc(550+i*27,620,10,0,7);ctx.fill();ctx.fillStyle="#c6a15c";ctx.beginPath();ctx.arc(550+i*27,615,7,0,7);ctx.fill()}
+ctx.fillStyle="#d9e5d5";ctx.font="bold 14px system-ui";ctx.fillText("ПОДЗЕМНАЯ ШАХТА",520,690);
+ctx.fillStyle="#baf05b";ctx.font="bold 17px system-ui";ctx.fillText("+"+Math.floor(s.stock)+" кг",735,300);
+ctx.fillStyle="#e2c37a";ctx.font="bold 15px system-ui";ctx.fillText("ШАХТА "+(s.mine+1),730,335);
+}
+canvas.addEventListener("click",e=>{let r=canvas.getBoundingClientRect(),y=(e.clientY-r.top)/r.height*725;if(y>250){s.selected=Math.max(0,Math.min(4,Math.floor((y-265)/82)));draw()}});
+let last=Date.now();
+function tick(){let now=Date.now(),dt=Math.min(1,(now-last)/1000);last=now;anim++;
+s.minerT+=dt;s.liftT+=dt;s.factoryT+=dt;
+let mining=5/(1+s.pick*.25);if(s.minerT>=mining){let amount=s.miners*(1+s.pick*.25);s.stock+=amount;s.total+=amount;s.minerT=0}
+if(s.liftT>=Math.max(1,7/s.lift)){let move=Math.min(s.stock,s.lift*5);s.stock-=move;s.ore+=move;s.liftT=0}
+if(s.factoryT>=Math.max(1,8/(s.factory+s.auto*.7))){let process=Math.min(s.ore,s.factory*5);s.ore-=process;s.cash+=process*prices[s.mine]*(1+s.value*.2);s.factoryT=0}
+$("minerBar").style.width=(s.minerT/(5/(1+s.pick*.25))*100)+"%";$("liftBar").style.width=(s.liftT/Math.max(1,7/s.lift)*100)+"%";$("factoryBar").style.width=(s.factoryT/Math.max(1,8/(s.factory+s.auto*.7))*100)+"%";
+if(anim%5===0){update();save()}else draw();requestAnimationFrame(tick)}
+update();requestAnimationFrame(tick);
+})();
+</script>
+</body></html>
