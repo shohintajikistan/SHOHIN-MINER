@@ -1,1 +1,0 @@
-# SHOHIN-MINER
